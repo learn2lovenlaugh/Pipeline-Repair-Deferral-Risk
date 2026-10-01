@@ -1,0 +1,1108 @@
+<title>Line 01 Deferral Risk</title>
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f3f5f3; --surface:#fcfcfb; --sunk:#e8ece9; --ink:#15191c; --ink2:#4c5459; --muted:#767e84;
+  --line:#dce1dd; --line2:#c6cdc8; --accent:#1d4e63; --accent-soft:#e3edf1;
+  --s1:#2a78d6;
+  --good:#2f7d3a; --good-bg:#e6f2e7; --warn:#9a6200; --warn-bg:#fbf0dc; --crit:#b3302d; --crit-bg:#f9e3e2;
+  --mono: ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans: "Avenir Next","Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px;padding-block:18px 40px;display:grid;gap:16px}
+header{border-bottom:2px solid var(--ink);padding-bottom:10px}
+h1{font-size:22px;margin:0;text-wrap:balance}
+.sub{color:var(--ink2);font-size:13px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;min-width:0}
+h2{font-size:15px;margin:0 0 8px}
+h3.t{font-size:13px;margin:14px 0 6px}
+.note{color:var(--muted);font-size:12.5px;margin:6px 0 0}
+.ref{font:11px var(--mono);color:var(--accent);white-space:nowrap}
+button{font:600 12.5px var(--sans);border:1px solid var(--line2);background:var(--surface);color:var(--ink);padding:6px 11px;border-radius:4px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+button.danger{color:var(--crit)}
+button.danger.arm{background:var(--crit);color:#fff;border-color:var(--crit)}
+input,select{font:13px var(--mono);width:100%;padding:5px 6px;border:1px solid var(--line2);border-radius:3px;background:#fff;color:var(--ink);font-variant-numeric:tabular-nums}
+input:focus-visible,select:focus-visible,summary:focus-visible,button:focus-visible,[role=tab]:focus-visible,tr.site:focus-visible{outline:2px solid var(--s1);outline-offset:1px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.bar .sp{flex:1}
+.tog{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;margin:0}
+.tog input{width:16px;height:16px;margin:0;accent-color:#1d4e63}
+button.primary{background:#1d4e63;color:#fff;border-color:#1d4e63}
+button.primary:hover{background:#163d4e}
+.bar select{width:auto}
+/* site table */
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th{text-align:right;font-weight:600;color:var(--ink2);border-bottom:1px solid var(--ink);padding:5px 8px;white-space:nowrap}
+td{text-align:right;padding:5px 8px;border-bottom:1px solid var(--line);font-family:var(--mono);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td.l,th.l{text-align:left;font-family:var(--sans)}
+td.txt{font-family:var(--sans);text-align:left;white-space:normal;color:var(--ink2)}
+tr.hl td{background:var(--accent-soft);font-weight:600}
+tr.site{cursor:pointer}
+tr.site:hover td{background:#eef3f5}
+tr.site.on td{background:var(--accent-soft)}
+tr.site.on td:first-child{box-shadow:inset 4px 0 0 var(--accent)}
+.ribar{display:inline-block;height:9px;background:var(--crit);border-radius:2px;vertical-align:middle;margin-right:6px}
+.tw{overflow-x:auto}
+/* tabs */
+.tabs{display:flex;flex-wrap:wrap;gap:2px;border-bottom:1px solid var(--line2)}
+.tabs [role=tab]{border:1px solid transparent;border-bottom:0;border-radius:4px 4px 0 0;background:transparent;padding:7px 12px;color:var(--ink2);font-weight:600;margin-bottom:-1px}
+.tabs [role=tab][aria-selected=true]{background:var(--surface);border-color:var(--line2);color:var(--accent)}
+.panel{padding-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:8px 28px}
+.fld{display:grid;grid-template-columns:1fr 150px;gap:8px;align-items:center}
+.fld label{font-size:13px;color:var(--ink2)}
+.fld label small{display:block;color:var(--muted);font-size:11px;line-height:1.25}
+.editing{font-size:13px;color:var(--ink2);margin:0 0 8px}
+.fld.wide{grid-column:1/-1;grid-template-columns:minmax(200px,1fr) 3fr}
+.fld textarea{font:12.5px var(--mono);width:100%;min-height:44px;padding:5px 6px;border:1px solid var(--line2);border-radius:3px;resize:vertical}
+.fld .stat{display:block;font:11px var(--mono);color:var(--accent);margin-top:2px}
+.editing b{color:var(--accent)}
+/* answer + detail */
+.answer{border-radius:6px;padding:16px 18px;border:1px solid;display:grid;gap:4px}
+.answer.ok{background:var(--good-bg);border-color:#bcd9bf}
+.answer.warn{background:var(--warn-bg);border-color:#e9cf9c}
+.answer.crit{background:var(--crit-bg);border-color:#ebb9b7}
+.answer .big{font-size:22px;font-weight:700;letter-spacing:-.01em}
+.answer .why{color:var(--ink2)}
+.answer .loc{font:600 11.5px var(--sans);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.chip{display:inline-block;font:700 11px var(--mono);letter-spacing:.05em;padding:2px 7px;border-radius:3px;color:#fff;white-space:nowrap}
+.chip.ok{background:var(--good)} .chip.warn{background:var(--warn)} .chip.crit{background:var(--crit)} .chip.info{background:var(--accent)} .chip.hi{background:#c0561b}
+.ph{grid-column:1/-1;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);font-weight:700;border-bottom:1px solid var(--line);padding:8px 0 3px;margin-top:4px}
+.ranges{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:4px 18px;font-size:12px;color:var(--ink2);margin-top:6px}
+.ranges b{font-family:var(--mono);color:var(--ink)}
+.warnline{color:var(--crit);font-size:12.5px;margin-top:4px}
+.io{border:1px solid var(--line2);border-radius:6px;padding:10px 12px;margin:0 0 10px;background:#fff;display:grid;gap:8px}
+.io h3{margin:0;font-size:13px}
+.io textarea{width:100%;min-height:150px;font:12px var(--mono);border:1px solid var(--line2);border-radius:3px;padding:6px;resize:vertical}
+.io .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.io input[type=file]{width:auto;font:12.5px var(--sans)}
+.msg{font-size:12.5px}.msg.ok{color:var(--good)}.msg.err{color:var(--crit)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:10px}
+.fact{border-left:3px solid var(--line2);padding:2px 10px}
+.fact .k{font-size:11.5px;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em}
+.fact .v{font:600 18px var(--mono);font-variant-numeric:tabular-nums}
+.fact .d{font-size:12px;color:var(--muted)}
+.tlw{overflow-x:auto}
+.tl{position:relative;height:132px;margin:0 70px;min-width:520px}
+.tl .axis{position:absolute;left:0;right:0;top:66px;height:6px;background:var(--sunk);border-radius:3px}
+.tl .prot{position:absolute;left:0;top:66px;height:6px;background:#9cc3ec;border-radius:3px}
+.tl .safe{position:absolute;top:66px;height:6px;background:#9fcfa6;border-radius:3px}
+.tl .pt{position:absolute;top:63px;transform:translateX(-50%);text-align:center;font-size:11.5px;width:140px;line-height:1.25}
+.tl .pt.up{top:auto;bottom:57px}
+.tl .dot{width:12px;height:12px;border-radius:50%;margin:0 auto;border:2px solid var(--surface)}
+.tl .dt{font-family:var(--mono);color:var(--ink)}
+.tl .lb{color:var(--ink2)}
+.tl .pt:not(.up) .dot{margin-bottom:3px}
+.tl .pt.up .dot{margin-top:3px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--ink2);margin:0 0 4px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:18px;height:0;border-top:2px solid}
+.chost{position:relative}
+.chost svg{display:block;width:100%;height:auto}
+.schem{overflow-x:auto}
+.schem svg{display:block;width:100%;min-width:720px;height:auto}
+.tip{position:absolute;pointer-events:none;background:#fff;border:1px solid var(--line2);border-radius:4px;padding:6px 8px;font:12px var(--mono);box-shadow:0 2px 8px rgba(20,30,35,.12);white-space:nowrap;z-index:3}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px}
+@media (max-width:520px){.two{grid-template-columns:1fr}}
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:16px}
+ol.calc{margin:0;padding-left:20px;display:grid;gap:6px;color:var(--ink2)}
+ol.calc b{color:var(--ink);font-family:var(--mono);font-weight:600}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px 16px;margin-bottom:10px}
+.kv>div{border-left:3px solid var(--accent);padding:1px 10px}
+.kv .k{font-size:11.5px;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em}
+.kv .v{font:600 16px var(--mono)}
+.sc{display:grid;gap:6px}
+.sc details{border:1px solid var(--line);border-radius:4px;background:#fff}
+.sc summary{cursor:pointer;padding:7px 10px;font-size:13px;display:flex;justify-content:space-between;gap:12px}
+.sc summary span:last-child{font-family:var(--mono);font-weight:600;white-space:nowrap}
+.sc .b{padding:4px 12px 10px;display:grid;gap:3px;font-size:12.5px;border-top:1px solid var(--line)}
+.sc .b div{display:grid;grid-template-columns:92px minmax(0,1fr);gap:8px}
+.sc .b i{font-style:normal;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;padding-top:1px}
+.sc .b code{font:12.5px var(--mono);color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.sc .grp{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin:8px 0 0;font-weight:700}
+ol.refs{margin:0;padding-left:28px;display:grid;gap:6px;font-size:13px;color:var(--ink2)}
+ol.refs b{color:var(--ink)}
+ol.refs .use{display:block;font-size:12px;color:var(--muted)}
+.sticky{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:var(--accent);color:#fff;border-radius:6px;padding:7px 14px;font-size:13px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sticky b{font-weight:700}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Line 01 Deferral Risk</h1>
+    <div class="sub">Compare up to 20 locations with the same set-up: a stagnant line from an offline pad, tied into a manifold fed by a producing pad. Click a row to load that location into the inputs, charts and calculations. A leak means the wall has corroded to zero.</div>
+  </header>
+
+  <section class="card">
+    <h2>Locations</h2>
+    <div class="bar">
+      <button id="bAdd">Add location</button>
+      <button id="bDup">Duplicate selected</button>
+      <button id="bDel" class="danger">Delete selected</button>
+      <button id="bExp">Export CSV</button>
+      <button id="bImp">Import CSV</button>
+      <span class="sp"></span>
+      <label class="tog" title="Off = deterministic only (no PoF)"><input type="checkbox" id="mcTog" checked> Monte Carlo</label>
+      <button id="bUpd" class="primary">Update</button><span id="updMsg" class="note" style="margin:0"></span>
+      <label for="sortBy" class="note" style="margin:0">Order</label>
+      <select id="sortBy"><option value="rank">By risk (L x C)</option><option value="entry">As entered</option><option value="dl">By deadline</option></select>
+    </div>
+    <div class="io" id="xPanel" hidden>
+      <h3>Export all inputs</h3>
+      <p class="note" style="margin:0">One row per location plus a settings block. Save it as a .csv file, edit it in Excel, then use Import CSV. Lines starting with # are notes and are ignored on import.</p>
+      <div class="row"><button id="xDl">Download .csv</button><button id="xCopy">Copy to clipboard</button><button id="xClose">Close</button><span class="msg" id="xMsg"></span></div>
+      <label for="xText" class="note" style="margin:0">CSV text (select all and copy if the download does not start):</label>
+      <textarea id="xText" readonly spellcheck="false"></textarea>
+    </div>
+    <div class="io" id="iPanel" hidden>
+      <h3>Import inputs and recalculate</h3>
+      <p class="note" style="margin:0">Choose a .csv file exported from this page, or paste its text below. Importing replaces all locations (and the settings, if the file has a settings block). Missing columns keep their default values.</p>
+      <div class="row"><label for="iFile" class="note" style="margin:0">File</label><input type="file" id="iFile" accept=".csv,text/csv,text/plain"></div>
+      <label for="iText" class="note" style="margin:0">Or paste CSV text:</label>
+      <textarea id="iText" spellcheck="false" placeholder="Paste the exported CSV here"></textarea>
+      <div class="row"><button id="iGo">Import and recalculate</button><button id="iUndo" hidden>Undo import</button><button id="iClose">Close</button><span class="msg" id="iMsg"></span></div>
+    </div>
+    <div class="tw"><table id="siteTable"></table></div>
+    <p class="note">Risk = likelihood (L, 1 to 5) x consequence (C, 1 to 5) <span class="ref">[15][16]</span>. Category ranges and risk bands are set in the Settings tab. <span id="prodNote"></span> <span id="siteCount"></span></p>
+    <div class="two" style="margin-top:6px">
+      <div><h3 class="t">Risk matrix, all locations</h3><div id="rplot"></div><div id="ranges"></div><p class="note">Numbers are locations. Click one to select it.</p></div>
+      <div><h3 class="t">Modification deadline by location</h3><div id="dlbars"></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 id="p50H">Schedule: when PoF passes 50%, all locations</h2>
+    <p class="note" id="p50N">For each location, the calendar date when the Monte Carlo probability of failure (as-entered case) passes 50%, i.e. the median failure date <span class="ref">[18]</span>. The shaded span runs from the 10% PoF date to the 50% date; the tick is the modification deadline. Ordered by the 50% date, earliest first. Click a row to select that location.</p>
+    <div id="p50bars"></div>
+  </section>
+
+  <div class="sticky" id="sticky"></div>
+
+  <section class="card">
+    <p class="editing" id="editing"></p>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div id="panels"></div>
+  </section>
+
+  <section id="answer"></section>
+
+  <section class="card">
+    <h2 id="schemH">How the facilities are connected</h2>
+    <div class="schem" id="schem"></div>
+    <p class="note" id="schemN"></p>
+  </section>
+
+  <section class="card">
+    <h2>Key dates</h2>
+    <div class="tlw"><div class="tl" id="tl"></div></div>
+    <div class="facts" id="facts"></div>
+  </section>
+
+  <section class="card">
+    <h2 id="projH">Wall-thinning projection with uncertainty</h2>
+    <div id="proj"></div>
+    <p class="note" id="projN"></p>
+  </section>
+
+  <section class="card" id="pofCard">
+    <h2 id="pofH">Probability of failure</h2>
+    <div class="two"><div id="pofChart"></div><div class="tw" id="pofTbl"></div></div>
+    <p class="note" id="pofN"></p>
+  </section>
+
+  <section class="card" id="modeCard">
+    <h2>Operating mode: shut in (stagnant) vs kept in dynamic dead leg</h2>
+    <div class="two"><div id="modeChart"></div><div class="tw" id="modeTbl"></div></div>
+    <p class="note" id="modeN"></p>
+  </section>
+
+  <section class="card">
+    <h2>How the answer is calculated</h2>
+    <ol class="calc" id="calc"></ol>
+  </section>
+
+  <section class="card">
+    <h2>Leak size and time to surface (if a leak occurs)</h2>
+    <p class="note" style="margin:0 0 10px">Leak rate from orifice flow at the leak-point pressure <span class="ref">[5][6]</span>. Soil decides whether fluid fractures to surface, fills pores and rises, or drains down <span class="ref">[5][7][8][10][11]</span>. Released volume = leak rate x (time to surface + patrol interval + time to isolate) <span class="ref">[5][12][13]</span>.</p>
+    <div class="kv" id="leakKV"></div>
+    <div class="three">
+      <div><h3 class="t">Other hole sizes (comparison only)</h3><div class="tw" id="leakHole"></div></div>
+      <div><h3 class="t">Other soil types (comparison only)</h3><div class="tw" id="leakSoil"></div></div>
+      <div><h3 class="t">Other cover depths (comparison only)</h3><div class="tw" id="leakCover"></div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Three options compared</h2>
+    <div class="tw" id="scen"></div>
+  </section>
+
+  <section class="card">
+    <h2>If the modification is done by...</h2>
+    <div class="tw" id="tbl"></div>
+  </section>
+
+  <section class="card">
+    <h2>Sample calculations</h2>
+    <p class="note" style="margin:0 0 8px">For the selected location: formula, inputs substituted, result and reference. Click to expand.</p>
+    <div class="sc" id="samples"></div>
+  </section>
+
+  <section class="card">
+    <h2>References</h2>
+    <ol class="refs" id="refs"></ol>
+    <p class="note">Confirm the edition in force before citing. [A] marks an engineering assumption of this model with no published source; replace it with site data where available.</p>
+  </section>
+</div>
+
+<script>
+"use strict";
+/* ================= references ================= */
+const REFS=[
+  ['API 570, Piping Inspection Code: In-service Inspection, Rating, Repair, and Alteration of Piping Systems. American Petroleum Institute.','Corrosion rate = metal loss / time; remaining life = (t_actual - t_required) / corrosion rate; inspection interval limited to one-half of remaining life.'],
+  ['API 579-1/ASME FFS-1, Fitness-For-Service. API / ASME.','Remaining life assessment with a future corrosion allowance (Parts 4 and 5).'],
+  ['AMPP (NACE) SP0106, Control of Internal Corrosion in Steel Pipelines and Piping Systems.','Chemical treatment programs; effectiveness must be verified by monitoring.'],
+  ['AMPP (NACE) SP0775, Preparation, Installation, Analysis, and Interpretation of Corrosion Coupons in Oilfield Operations.','Measured corrosion rates to replace the assumed baseline and worst-case rates.'],
+  ['API RP 581, Risk-Based Inspection Methodology, Part 3: Consequence of Failure. American Petroleum Institute.','Liquid release rate through a hole W = Cd A sqrt(2 rho dP), Cd = 0.61; release duration from detection and isolation time; soil hydraulic conductivity and porosity by soil type; conductivity adjusted for fluid density and viscosity; environmental cleanup and business interruption costs.'],
+  ['Crane Co., Technical Paper No. 410, Flow of Fluids Through Valves, Fittings, and Pipe.','Orifice flow equation and discharge coefficient; hydrostatic head 0.433 psi/ft per unit specific gravity.'],
+  ['Freeze, R.A. and Cherry, J.A. (1979). Groundwater. Prentice-Hall.','Darcy\'s law; hydraulic conductivity and porosity ranges by soil type; intrinsic permeability k = K mu / (rho g).'],
+  ['Bear, J. (1972). Dynamics of Fluids in Porous Media. American Elsevier.','Steady flow from a spherical source, Q = 4 pi k r0 dP / mu.'],
+  ['Das, B.M. Principles of Geotechnical Engineering. Cengage Learning.','Soil unit weights, vertical overburden stress sv = gamma h, cohesion ranges.'],
+  ['Jaworski, G.W., Duncan, J.M. and Seed, H.B. (1981). Laboratory Study of Hydraulic Fracturing. Journal of the Geotechnical Engineering Division, ASCE, 107(6), 713-732.','Soil fractures when fluid pressure exceeds the confining stress plus the soil tensile strength (cohesion).'],
+  ['Van Zyl, J.E., Alsaydalani, M.O.A., Clayton, C.R.I., Bird, T. and Dennis, A. (2013). Soil fluidisation outside leaks in water distribution pipes - preliminary observations. Proc. ICE Water Management, 166(10), 546-555.','Pressurized buried leaks fluidize and erode the surrounding soil and channel toward the surface.'],
+  ['49 CFR 195.412, Inspection of rights-of-way and crossings under navigable waters.','Right-of-way patrols at intervals not exceeding 3 weeks, at least 26 times per calendar year.'],
+  ['API RP 1175, Pipeline Leak Detection Program Management. American Petroleum Institute.','Leak detection and response times that set how long a leak runs before isolation.'],
+  ['Line fill volume: 1 bbl = 9,702 in3, so V (bbl/ft) = ID^2 x pi/4 x 12 / 9,702 = ID^2 / 1029.4.','Unit conversion.'],
+  ['API RP 1160, Managing System Integrity for Hazardous Liquid Pipelines. American Petroleum Institute.','Risk assessment: risk as the combination of likelihood of failure and consequence of failure; ranking of segments for mitigation.'],
+  ['API RP 581, Risk-Based Inspection Methodology, Part 1: Inspection Planning Methodology. American Petroleum Institute.','5 x 5 risk matrix with likelihood and consequence categories; risk ranking and risk-based mitigation timing.'],
+  ['ASME B31G, Manual for Determining the Remaining Strength of Corroded Pipelines. ASME.','Modified B31G (0.85dL) failure pressure: flow stress = SMYS + 10 ksi, Folias factor M, 80% depth limit.'],
+  ['DNV-RP-F101, Corroded Pipelines. DNV.','Probabilistic (reliability) assessment of corrosion defects: uncertainty in depth, growth rate and strength; probability of failure over time.'],
+  ['AMPP (NACE) TM0194, Field Monitoring of Bacterial Growth in Oil and Gas Systems.','Evidence of microbiologically influenced corrosion (MIC) used to select the MIC case.']
+];
+const R=(...n)=>refify(n.map(x=>'['+x+']').join(''));
+function refify(t){ return String(t).replace(/\[(\d+|A)\]/g,(m0,n)=>`<span class="ref" title="${n==='A'?'Engineering assumption of this model':esc(REFS[+n-1]?REFS[+n-1][0]:'')}">[${n}]</span>`); }
+
+/* ================= constants ================= */
+const SOILS={
+  gravel:{n:'Gravel',K:1e-2,por:.30,gam:20.0,c:0,sr:.05,col:'#d9d2c0'},
+  sand:{n:'Sand',K:1e-4,por:.35,gam:18.5,c:0,sr:.10,col:'#eadfb8'},
+  siltysand:{n:'Silty sand',K:1e-5,por:.38,gam:18.5,c:5,sr:.15,col:'#e2d6b5'},
+  silt:{n:'Silt',K:1e-7,por:.42,gam:18.0,c:10,sr:.25,col:'#d8cdb4'},
+  clay:{n:'Clay',K:1e-9,por:.45,gam:17.5,c:25,sr:.35,col:'#c9b9a0'}
+};
+const HOLES=[1/64,1/32,1/16,1/8,1/4];
+const MAXS=20;
+const SITE_DEF={site:'Location',pad1Name:'Pad 01',pad2Name:'Pad 02',mfhName:'MFH',cfName:'Central Facility',lineName:'Line 01',
+  off:'2026-10-01',lowFlow:'',measDate:'',dlX:1.5,stY:3.4,mic1:1.5,mic2:2.0,mic3:3.0,micS1:'no',micS2:'no',micS3:'no',chem:'yes',prot:0,od:8.625,wt:0.322,press:350,pMode:'const',pHigh:900,pLow:250,dumpMin:5,cycleMin:30,lenMi:3.2,wallBasis:'pct',wall:70,installYear:2012,crTreated:7,chemEff:1,crUntreated:23.7,accel:1,elev:0,volBasis:'calc',volManual:50,
+  q1:1200,q2:3000,days:14,value:35,
+  hole:0.0625,cover:3,soil:'silt',sg:0.87,visc:5,patrol:7,iso:12,maxUnd:30,
+  cleanBasis:'fixed',cleanVal:250000,inclProd:'yes',mod:850000,mic:'no',smys:52000,defLen:2,dataScope:'shared',oNormNo:'',oStagNo:'',oNormMic:'',oStagMic:''};
+const ASM_DEF={useMC:'yes',rateSrc:'auto',worstData:'p90',dropZeros:'yes',stagFallback:'scale',stagRatio:3,dNormNo:'',dStagNo:'',dNormMic:'',dStagMic:'',crit:'b31g',sfB:1.0,nSim:5000,covR:0.25,covS:0.25,wtCov:0.05,micLo:1.5,micHi:3.0,dlBasis:'rl',pofTarget:1,lpYears:3,pb1:1,pb2:5,pb3:20,pb4:50,fast:2,rlf:0.5,horizon:10,cd:0.61,r0:2,fch:25,
+  lBasis:'worst',lb1:1,lb2:2,lb3:5,lb4:10,cBasis:'cost',cc1:100000,cc2:500000,cc3:1000000,cc4:5000000,cv1:1,cv2:10,cv3:100,cv4:1000,rb1:4,rb2:9,rb3:16};
+const BANDS=[['Low','ok','#d3ead6'],['Medium','warn','#f6e7b8'],['High','hi','#f5c9a3'],['Very high','crit','#efaeab']];
+function pCat(pct){ return pct<A.pb1?1:pct<A.pb2?2:pct<A.pb3?3:pct<A.pb4?4:5; }
+function lCat(t){ return t<A.lb1?5:t<A.lb2?4:t<A.lb3?3:t<A.lb4?2:1; }
+function cVal(m){ return A.cBasis==='bbl'?m.L.V:m.C; }
+function cCat(v){ const b=A.cBasis==='bbl'?[A.cv1,A.cv2,A.cv3,A.cv4]:[A.cc1,A.cc2,A.cc3,A.cc4]; return v<b[0]?1:v<b[1]?2:v<b[2]?3:v<b[3]?4:5; }
+function band(sc){ return sc<=A.rb1?0:sc<=A.rb2?1:sc<=A.rb3?2:3; }
+const fC=v=>A.cBasis==='bbl'?fN(v,1)+' bbl':f$(v);
+const EXAMPLES=[
+  {site:'Owens Unit A 1',off:'2026-12-01',lowFlow:'2024-01-01',wallBasis:'calc',installYear:2012,crTreated:7,crUntreated:23.7,prot:0,pad1Name:'Owens Unit A 1',pad2Name:'Collins Unit A',mfhName:'MFH528',cfName:'KCF02',od:4.5,wt:0.237,press:900,lenMi:1,wall:50,elev:0,q1:200,q2:600,days:14,value:80,hole:1/64,cover:4,soil:'siltysand',patrol:14,iso:4,maxUnd:30,cleanVal:250000,mod:60000},
+  {site:'Example B',chem:'no',crUntreated:8,pad1Name:'Example Pad B1',pad2Name:'Example Pad B2',mfhName:'MFH-B',cfName:'CF-B',od:6.625,wt:0.280,press:600,lenMi:2.1,wall:65,elev:30,q1:800,q2:1500,days:10,value:60,hole:1/32,cover:3,soil:'clay',cleanVal:600000,mod:220000},
+  {site:'Example C',pad1Name:'Example Pad C1',pad2Name:'Example Pad C2',mfhName:'MFH-C',cfName:'CF-C',od:8.625,wt:0.322,press:350,lenMi:3.2,wall:80,elev:15,q1:1200,q2:3000,days:14,value:35,hole:1/16,cover:5,soil:'sand',cleanVal:400000,mod:850000}
+];
+
+/* ================= state ================= */
+let A, SITES, cur=0, P;
+function load(){
+  let s=null; try{ s=JSON.parse(localStorage.getItem('l01v6')||'null'); }catch(e){}
+  if(s&&Array.isArray(s.sites)&&s.sites.length){ const oldInc=s.asm&&s.asm.inclProd; A=Object.assign({},ASM_DEF,s.asm||{}); delete A.inclProd; if(!s.asm||s.asm.rateSrc!=='auto'&&!s.asm._v7){ A.rateSrc='auto'; } A._v7=1; if(oldInc) s.sites.forEach(x=>{ if(x.inclProd==null) x.inclProd=oldInc; }); SITES=s.sites.slice(0,MAXS).map(x=>{ const o=Object.assign({},SITE_DEF,x); if(x.mic==='yes'&&x.micS1==null){ o.micS1=o.micS2=o.micS3='yes'; } for(const k of ['dlX','stY','mic1','mic2','mic3']) if(o[k]===''||o[k]==null||!isFinite(parseFloat(o[k]))) o[k]=SITE_DEF[k]; else o[k]=parseFloat(o[k]); if(x.crHist!=null&&x.crTreated==null){ if(x.chem==='no') o.crUntreated=x.crHist; else o.crTreated=x.crHist; } delete o.crHist; return o; }); cur=Math.min(s.cur||0,SITES.length-1); return; }
+  A=Object.assign({},ASM_DEF); SITES=EXAMPLES.map(x=>Object.assign({},SITE_DEF,x)); cur=0;
+}
+function save(){ try{ localStorage.setItem('l01v6',JSON.stringify({asm:A,sites:SITES,cur})); }catch(e){} }
+load();
+const ctx=s=>Object.assign({},A,s);
+
+/* ================= helpers ================= */
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function dateAt(yrs,p){ p=p||P; if(!isFinite(yrs)) return 'not reached'; let d=new Date(p.off+'T00:00:00'); if(isNaN(d)){ const n=new Date(); d=new Date(n.getFullYear(),n.getMonth(),1); } d.setMonth(d.getMonth()+Math.floor(yrs*12+1e-9)); return MON[d.getMonth()]+' '+d.getFullYear(); }
+const f$=v=>{const a=Math.abs(v); if(a>=1e6) return '$'+(v/1e6).toFixed(2)+'M'; if(a>=1e3) return '$'+Math.round(v/1e3)+'k'; return '$'+Math.round(v);};
+const fPct=x=>!isFinite(x)?'n/a':x<=0?'0%':x<0.001?'<0.1%':(x*100).toFixed(x<0.1?1:0)+'%';
+const fY=y=>!isFinite(y)?'-':(y<1?Math.round(y*12)+' mo':y.toFixed(1)+' yr');
+const fT=d=>!isFinite(d)?'does not surface':d<1/24?'< 1 h':d<1?(d*24).toFixed(1)+' h':d.toFixed(1)+' d';
+const fN=(v,n=2)=>{ if(!isFinite(v)) return String(v); const a=Math.abs(v); if(a!==0&&(a<1e-3||a>=1e6)) return v.toExponential(n); return v.toFixed(a<1?Math.max(n,3):a<100?n:0); };
+function esc(v){return String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fHole(d){ const fr=[[1/64,'1/64'],[1/32,'1/32'],[1/16,'1/16'],[1/8,'1/8'],[1/4,'1/4']]; for(const [v,s] of fr) if(Math.abs(v-d)<1e-6) return s+' in'; return d+' in'; }
+const nm=(p,k,d)=>((p[k]||'').trim()||d);
+const PSI=6894.757, FT=0.3048, IN=0.0254, BPD=543440, G=9.81;
+function niceTicks(lo,hi,n){ const span=hi-lo||1; const step0=span/n; const mag=Math.pow(10,Math.floor(Math.log10(step0))); const r=step0/mag; const step=(r<1.5?1:r<3?2:r<7?5:10)*mag; const t=[]; for(let v=Math.ceil(lo/step)*step; v<=hi+1e-9; v+=step) t.push(+v.toFixed(10)); return t; }
+
+/* ================= models ================= */
+function leakCalc(p,soilKey,hFt,dIn,pr){
+  if(typeof pr==='number') pr={hi:pr,lo:pr,f:0};
+  const S=SOILS[soilKey]||SOILS.silt, h=Math.max(0.1,hFt)*FT, rho=p.sg*1000, mu=p.visc/1000;
+  const sv=S.gam*1000*h, pAllow=sv+S.c*1000;
+  const dPhi=Math.max(0,pr.hi*PSI-sv), dPlo=Math.max(0,pr.lo*PSI-sv), f=Math.min(1,Math.max(0,pr.f));
+  const sRamp=Math.abs(dPhi-dPlo)<1?Math.sqrt(dPhi):(2/3)*(Math.pow(dPhi,1.5)-Math.pow(dPlo,1.5))/(dPhi-dPlo); // mean sqrt(dP) over linear decay
+  const sAvg=f*sRamp+(1-f)*Math.sqrt(dPlo);                      // time-averaged sqrt(dP) over one cycle
+  const dP=sAvg*sAvg;                                            // equivalent constant dP
+  const Ar=Math.PI*Math.pow(dIn*IN,2)/4, kq=p.cd*Ar*Math.sqrt(2/rho);
+  const Qo=kq*sAvg, Qpk=kq*Math.sqrt(dPhi);
+  const Qsup=p.q2>0?p.q2/BPD:Infinity;
+  const Q=Math.min(Qo,Qsup), capped=Qo>Qsup, QpkC=Math.min(Qpk,Qsup);
+  const k=S.K*1e-3/(1000*G), r0=p.r0*IN;
+  const Qs=4*Math.PI*k*r0*pAllow/mu;
+  const Kf=k*rho*G/mu;
+  const Qd=Kf*Math.PI*h*h;
+  const Vp=S.por*(1-S.sr)*(2/3)*Math.PI*h*h*h;
+  let path,t;
+  if(QpkC>Qs){ path='frac'; t=(p.fch/100)*Vp/Q/86400; }
+  else if(Q>Qd){ path='fill'; t=Vp/(Q-Qd)/86400; }
+  else { path='down'; t=Infinity; }
+  const tFind=isFinite(t)?t+p.patrol:p.maxUnd, tTot=tFind+p.iso/24, V=Q*BPD*tTot;
+  return {S,h,rho,mu,sv,pAllow,dP,dPhi,dPlo,f,sRamp,sAvg,Qpk:QpkC,A:Ar,Qo,Qsup,Q,capped,k,r0,Qs,Kf,Qd,Vp,path,t,tFind,tTot,V,qb:Q*BPD};
+}
+const PATH={frac:'Soil fractures; fluid channels up',fill:'Fills soil pores and rises',down:'Drains downward; may not surface'};
+/* ---- Modified B31G (ASME B31G, 0.85dL) ---- */
+function b31gPf(d,t,D,L,smys){ const z=L*L/(D*t); const M=z<=50?Math.sqrt(1+0.6275*z-0.003375*z*z):0.032*z+3.3; const sf=smys+10000, r=d/t; return 2*sf*t/D*(1-0.85*r)/(1-0.85*r/M); }
+function critWall(p,pOp){ // remaining wall at which failure is reached
+  if(p.crit!=='b31g') return {tc:0,dc:p.wt,note:'leak at zero wall'};
+  const t=p.wt,D=p.od,L=Math.max(0.01,p.defLen),need=Math.max(0,p.sfB)*pOp;
+  if(b31gPf(0,t,D,L,p.smys)<need) return {tc:t,dc:0,note:'intact pipe below required pressure'};
+  if(b31gPf(0.8*t,t,D,L,p.smys)>=need) return {tc:0.2*t,dc:0.8*t,note:'80% depth limit governs'};
+  let a=0,b=0.8*t; for(let k=0;k<60;k++){ const c=(a+b)/2; if(b31gPf(c,t,D,L,p.smys)>=need) a=c; else b=c; }
+  return {tc:t-a,dc:a,note:'failure pressure = required pressure'};
+}
+/* ---- seeded random numbers ---- */
+function rng(seed){ let a=seed>>>0; return ()=>{ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function gauss(r){ let u=0; while(u===0) u=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r()); }
+const lnf=(cov,z)=>{ const sg=Math.sqrt(Math.log(1+cov*cov)); return Math.exp(sg*z); };
+
+/* ---- measured corrosion-rate data ---- */
+const _pc=new Map();
+function parseList(str){ str=String(str||''); const dz=!A||A.dropZeros!=='no', key=(dz?'1|':'0|')+str; if(_pc.has(key)) return _pc.get(key); const a=str.split(/[\s,;]+/).filter(x=>x!=='').map(x=>parseFloat(x)).filter(x=>isFinite(x)&&(dz?x>0:x>=0)); a.sort((x,y)=>x-y); _pc.set(key,a); return a; }
+const qtl=(a,q)=>a.length?a[Math.min(a.length-1,Math.max(0,Math.round(q*(a.length-1))))]:NaN;
+const mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:NaN;
+function rateData(p,ev1,ev3){
+  if(p.rateSrc==='dist') return null;                                   // 'auto' (default): use any list that has values
+  const own=p.dataScope==='own';
+  const g=k=>parseList(own?p['o'+k]:p['d'+k]);
+  const nNo=g('NormNo'), nMic=g('NormMic'), sNo=g('StagNo'), sMic=g('StagMic');
+  // MIC case: use MIC lists when present, otherwise the no-MIC lists (MIC factor then applies)
+  const norm=ev1&&nMic.length?nMic:nNo, stag=ev3&&sMic.length?sMic:sNo;
+  return {norm,stag,own,normIsMic:ev1&&nMic.length>0,stagIsMic:ev3&&sMic.length>0,any:norm.length>0||stag.length>0};
+}
+function validDate(str){ return !!str && !isNaN(new Date(String(str)+'T00:00:00')); }
+function decYear(str,fb){ const d=new Date(String(str||'')+'T00:00:00'); if(isNaN(d)) return fb; return d.getFullYear()+d.getMonth()/12+(d.getDate()-1)/365; }
+const optF=(v,d)=>(v===''||v==null||!isFinite(parseFloat(v)))?d:parseFloat(v);
+/* three-stage cumulative loss: normal r1 [tI,tLF), dynamic dead leg r2 [tLF,tR), stagnant r3 [tR,...) with tR = shut-in + residual period */
+function mkLoss(tI,tLF,tR,r1,r2,r3){
+  const A1=r1*(tLF-tI), A2=r2*(tR-tLF);
+  const Lc=t=>r1*Math.max(0,Math.min(t,tLF)-tI)+r2*Math.max(0,Math.min(t,tR)-tLF)+r3*Math.max(0,t-tR);
+  const inv=L=>{ if(L<=0) return tI; if(L<=A1) return r1>0?tI+L/r1:Infinity; L-=A1; if(L<=A2) return r2>0?tLF+L/r2:Infinity; L-=A2; return r3>0?tR+L/r3:Infinity; };
+  return {Lc,inv};
+}
+function model(p){
+  const chem=p.chem!=='no', ev1=p.micS1==='yes', ev2=p.micS2==='yes', ev3=p.micS3==='yes', mic=ev1||ev2||ev3;
+  const RD=rateData(p,ev1,ev3), dN=RD&&RD.norm.length?RD.norm:null, dS=RD&&RD.stag.length?RD.stag:null;
+  const X=Math.max(0,+p.dlX||0), Y=Math.max(0,+p.stY||0);
+  const M1=ev1?Math.max(1,+p.mic1||1):1, M2=ev2?Math.max(1,+p.mic2||1):1, M3=ev3?Math.max(1,+p.mic3||1):1;
+  const nIsMic=!!(RD&&RD.normIsMic), sIsMic=!!(RD&&RD.stagIsMic);
+  const k1=nIsMic?1:M1, k2=nIsMic?M2/M1:M2, k3=nIsMic?M3/M1:M3;   // MIC multipliers on CR_n per stage (MIC normal data already carries M1)
+  const M=M1, Ms=sIsMic?1:M3, micMid=M1;
+  const crNin=(chem?Math.max(0,p.crTreated)*Math.max(0,p.chemEff):Math.max(0,p.crUntreated))/1000; // CR_n from inputs, in/yr
+  const crN=dN?mean(dN)/1000:crNin;                                         // normal rate (data mean if given)
+  const hasSI=validDate(p.off), hasLF=validDate(p.lowFlow);
+  const tp=hasSI&&chem&&p.opMode!=='dl'?Math.max(0,p.prot)/12:0;                            // residual period after shut-in (dead-leg rate continues)
+  const nowD=new Date(), todayDec=nowD.getFullYear()+nowD.getMonth()/12+(nowD.getDate()-1)/365;
+  const offDec=hasSI?decYear(p.off,todayDec):todayDec, offYr=Math.floor(offDec);   // no shut-in date: assess from today, line still flowing
+  const tI=Math.min(offDec,p.installYear||offDec);
+  const dlMode=p.opMode==='dl', stag=hasSI&&!dlMode;                       // dlMode: line kept in dynamic dead leg service instead of being shut in
+  const tLF=hasLF?Math.max(tI,Math.min(offDec,decYear(p.lowFlow,offDec))):(hasSI?offDec:Infinity), tR=stag?offDec+tp:Infinity;
+  const r1=crN*k1, r2=crN*X*k2, r3s=dS?mean(dS)/1000*Ms:crN*Y*k3;         // stage rates
+  const r3=stag?r3s:((hasLF||dlMode&&hasSI)?r2:r1);                                        // no shut-in: current stage rate continues
+  const Ls=stag?mkLoss(tI,tLF,tR,r1,r2,r3):mkLoss(tI,tLF,Infinity,r1,r2,0);
+  const tRef=p.wallBasis==='calc'?tI:decYear(p.measDate,offDec), wRef=p.wallBasis==='calc'?p.wt:p.wall/100*p.wt;
+  const wallAbs=t=>wRef-(Ls.Lc(t)-Ls.Lc(tRef));
+  const tNow=Math.max(0,wallAbs(offDec));
+  const svcYrs=offDec-tI, yrsN=tLF-tI, yrsD=offDec-tLF;
+  const wallPct=p.wt>0?tNow/p.wt*100:0;
+  const crT=r2, cr=Math.max(1e-6,r3), crPre=stag?r2:r3;                            // post-shut-in: residual at r2, then r3
+  const noRate=!(r3>0)||(p.wallBasis==='calc'&&!(r1>0));
+  const dW=stag?(dS?dS.map(v=>v*Ms):(dN?dN.map(v=>v*Y*k3):null)):(dN?dN.map(v=>v*((hasLF||dlMode&&hasSI)?X*k2:k1)):null);
+  const crW=Math.max(cr,dW&&p.worstData!=='factor'?(p.worstData==='max'?Math.max(...dW):qtl(dW.slice().sort((a,b)=>a-b),0.9))/1000:cr*Math.max(1,p.fast)); // worst case stage-3 rate
+  const head=0.433*p.sg*(p.elev||0), cyc=p.pMode==='cyclic';
+  const pHi=(cyc?p.pHigh:p.press)+head, pLo=(cyc?p.pLow:p.press)+head, fDump=cyc&&p.cycleMin>0?Math.min(1,Math.max(0,p.dumpMin/p.cycleMin)):0;
+  const pr={hi:pHi,lo:pLo,f:fDump}, pLoc=pHi;
+  const CW=critWall(p,pHi), tc=CW.tc;                                      // failure criterion
+  const loss=(t,rate)=>{ t=Math.max(0,t); if(t<=tp) return crT*t; return crT*tp+rate*(t-tp); };
+  const tZero=rate=>{ const a=tNow-tc; if(a<=0) return 0; const Lp=crT*tp; if(a<=Lp) return crT>0?a/crT:Infinity; return tp+(a-Lp)/rate; };
+  const tFailAbs=Ls.inv(Ls.Lc(tRef)+wRef-tc);                              // typical failure date (decimal year)
+  const tLeakT=tNow>tc?tZero(cr):tFailAbs-offDec, tLeakW=tZero(crW), rlT=tLeakT, rlW=tLeakW;
+  const dlRL=tNow>tc?Math.floor(p.rlf*tLeakW*12+1e-9)/12:0;
+  const wallAt=(t,rate)=>tNow-loss(t,rate);
+  const ID=p.od-2*p.wt, invPerFt=ID*ID/1029.4, inv=invPerFt*p.lenMi*5280;
+  const L=leakCalc(p,p.soil,p.cover,p.hole,pr);
+  const pEff=L.dP/PSI+L.sv/PSI;
+  L.Vcalc=L.V; L.manual=p.volBasis==='manual'; if(L.manual) L.V=Math.max(0,p.volManual);
+  const qLost=p.q2+p.q1, prodBbl=p.days*qLost, prod=prodBbl*p.value;
+  const clean=p.cleanBasis==='perbbl'?p.cleanVal*L.V:p.cleanVal;
+  const inclProd=p.inclProd!=='no';
+  const C=clean+(inclProd?prod:0);
+  const m={p,hasSI,hasLF,stag,dlMode,todayDec,chem,mic,ev1,ev2,ev3,micMid,M,Ms,M1,M2,M3,k1,k2,k3,nIsMic,sIsMic,X,Y,RD,dN,dS,crNin,crN,r1,r2,r3,tI,tLF,tR,Ls,tRef,wRef,wallAbs,yrsN,yrsD,noRate,tp,crT,crPre,offYr,offDec,svcYrs,wallPct,loss,tNow,cr,crW,rlT,rlW,tLeakT,tLeakW,tFailAbs,dlRL,wallAt,pLoc,pr,cyc,head,pHi,pLo,fDump,pEff,CW,tc,ID,invPerFt,inv,L,qLost,prodBbl,prod,inclProd,clean,C};
+  m.mcOn=p.useMC!=='no';
+  m.mc=m.mcOn?monteCarlo(p,m):{N:1,T:new Float64Array([Math.max(tI,tFailAbs)-offDec]),samples:[{r1,r2,r3,wRef}],off:true};
+  m.pofAt=t=>m.mcOn?pofAt(m.mc,t):NaN;
+  const dlP=m.mcOn?pofDeadline(m.mc,p.pofTarget/100):dlRL;
+  m.dlPof=dlP; m.dl=!m.mcOn?dlRL:p.dlBasis==='pof'?dlP:p.dlBasis==='min'?Math.min(dlRL,dlP):dlRL;
+  m.margin=wallAt(m.dl,crW)-tc;
+  return m;
+}
+/* ---- Monte Carlo time to failure (years after shut-in; negative = before shut-in) ---- */
+function monteCarlo(p,m){
+  const N=Math.max(200,Math.min(20000,Math.round(p.nSim||5000)));
+  const r=rng(1234567+Math.round((p.wt||0)*1e5)+(m.ev1?7:0)+(m.ev2?13:0)+(m.ev3?29:0));
+  const T=new Float64Array(N), tc=m.tc, samples=[];
+  const U=(a,b)=>a+(b-a)*r();
+  const Xi=m.X, Yi=m.Y, k1=m.k1, k2=m.k2, k3=m.k3;                        // factors fixed per location; spread comes from the rates
+  for(let i=0;i<N;i++){
+    const crN=m.dN?m.dN[Math.floor(r()*m.dN.length)]/1000:m.crNin*lnf(p.covR,gauss(r));
+    const r1=crN*k1, r2=crN*Xi*k2, r3=m.dS?m.dS[Math.floor(r()*m.dS.length)]/1000*m.Ms:crN*Yi*k3;
+    const wRef=p.wallBasis==='calc'?p.wt:m.wRef*(1+p.wtCov*gauss(r));
+    const Ls=m.stag?mkLoss(m.tI,m.tLF,m.tR,r1,r2,r3):mkLoss(m.tI,m.tLF,Infinity,r1,r2,0);
+    const tf=Ls.inv(Ls.Lc(m.tRef)+wRef-tc);
+    T[i]=Math.max(m.tI,tf)-m.offDec;
+    if(i<1500) samples.push({r1,r2,r3,wRef});
+  }
+  T.sort();
+  return {N,T,samples};
+}
+function pofAt(mc,t){ let lo=0,hi=mc.N; while(lo<hi){ const k=(lo+hi)>>1; if(mc.T[k]<=t) lo=k+1; else hi=k; } return lo/mc.N; }
+function pofDeadline(mc,target){ // latest month after shut-in with PoF <= target
+  if(pofAt(mc,0)>target) return 0; let mo=0; while(mo<600&&pofAt(mc,(mo+1)/12)<=target) mo++; return mo/12; }
+function portfolio(){
+  const ms=SITES.map((s,i)=>Object.assign(model(ctx(s)),{i,name:(s.site||'').trim()||('Location '+(i+1))}));
+  ms.forEach(m=>{ m.tL=A.lBasis==='typical'?m.tLeakT:m.tLeakW; m.pofL=m.pofAt(A.lpYears); m.lk=A.lBasis==='pof'&&m.mcOn?pCat(m.pofL*100):lCat(m.tL); m.cv=cVal(m); m.ck=cCat(m.cv); m.score=m.lk*m.ck; m.band=band(m.score); });
+  ms.slice().sort((a,b)=>b.score-a.score||a.tL-b.tL||b.cv-a.cv).forEach((m,j)=>m.rank=j+1);
+  return ms;
+}
+
+/* ================= site table ================= */
+let PF=[];
+function siteTable(){
+  const sort=document.getElementById('sortBy').value;
+  let rows=PF.slice(); if(sort==='rank') rows.sort((a,b)=>a.rank-b.rank); else if(sort==='dl') rows.sort((a,b)=>a.dl-b.dl);
+  let h=`<tr><th>#</th><th class="l">Location</th><th class="l">Offline pad -> manifold</th><th>Offline</th><th>Chem program</th><th>Wall (mils)</th><th>Worst-case life</th><th>Earliest leak</th><th>Modify by</th><th>PoF at modify-by</th><th>PoF ${A.lpYears} yr</th><th>Leak (bbl/d)</th><th>Released (bbl)</th><th>Production (bbl/d)</th><th>Lost prod. per leak (bbl)</th><th>Cost of leak</th><th>L</th><th>C</th><th>Risk (L x C)</th><th>Rank</th></tr>`;
+  for(const m of rows){ const s=SITES[m.i];
+    h+=`<tr class="site${m.i===cur?' on':''}" data-i="${m.i}" tabindex="0" aria-selected="${m.i===cur}"><td>${m.i+1}</td><td class="l">${esc(m.name)}</td><td class="l" style="color:var(--ink2)">${esc(nm(s,'pad1Name','Pad 01'))} -> ${esc(nm(s,'mfhName','MFH'))}</td><td>${m.hasSI?dateAt(0,m.p):'<span style="color:var(--muted)">not set</span>'}</td><td>${m.chem?'Yes':'No'}</td><td>${(m.tNow*1000).toFixed(0)}</td><td>${fY(m.rlW)}</td><td>${dateAt(m.tLeakW,m.p)}</td><td><b>${m.noRate?'<span class="chip crit">NO RATE</span>':dateAt(m.dl,m.p)}</b></td><td>${fPct(m.pofAt(m.dl))}</td><td>${fPct(m.pofL)}</td><td>${fN(m.L.qb,1)}</td><td>${fN(m.L.V,1)}</td><td title="Producing ${Number(m.p.q2).toLocaleString()} + non-producing ${Number(m.p.q1).toLocaleString()}">${Math.round(m.qLost).toLocaleString()}</td><td>${Math.round(m.prodBbl).toLocaleString()}</td><td title="${m.inclProd?'Cleanup + lost production':'Cleanup only (lost production excluded)'}">${f$(m.C)}${m.inclProd?'':' *'}</td><td>${m.lk}</td><td>${m.ck}</td><td class="l"><b style="font-family:var(--mono)">${m.score}</b> <span class="chip ${BANDS[m.band][1]}">${BANDS[m.band][0].toUpperCase()}</span></td><td>${m.rank}</td></tr>`; }
+  const T=document.getElementById('siteTable'); T.innerHTML=h;
+  T.querySelectorAll('tr.site').forEach(r=>{ const go=()=>select(+r.dataset.i); r.addEventListener('click',go); r.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}}); });
+  document.getElementById('prodNote').textContent=PF.some(m=>!m.inclProd)?'* Cost of leak excludes lost production for this location (Costs tab).':'Cost of leak includes lost production from both pads.';
+  document.getElementById('siteCount').textContent=`${SITES.length} of ${MAXS} locations.`;
+  document.getElementById('bAdd').disabled=SITES.length>=MAXS; document.getElementById('bDup').disabled=SITES.length>=MAXS; document.getElementById('bDel').disabled=SITES.length<=1;
+}
+function riskPlot(){
+  const host=document.getElementById('rplot');
+  const W=Math.max(300,host.clientWidth||520), g={l:118,r:8,t:8,b:62}, cw=(W-g.l-g.r)/5, ch=46, H=g.t+g.b+ch*5;
+  const lr=A.lBasis==='pof'?[`>= ${A.pb4}%`,`${A.pb3}-${A.pb4}%`,`${A.pb2}-${A.pb3}%`,`${A.pb1}-${A.pb2}%`,`< ${A.pb1}%`]:[`< ${A.lb1} yr`,`${A.lb1}-${A.lb2} yr`,`${A.lb2}-${A.lb3} yr`,`${A.lb3}-${A.lb4} yr`,`>= ${A.lb4} yr`];
+  const cb=A.cBasis==='bbl'?[A.cv1,A.cv2,A.cv3,A.cv4].map(v=>fN(v,0)):[A.cc1,A.cc2,A.cc3,A.cc4].map(f$);
+  const cr=[`< ${cb[0]}`,`${cb[0]}-${cb[1]}`,`${cb[1]}-${cb[2]}`,`${cb[2]}-${cb[3]}`,`>= ${cb[3]}`];
+  let s='';
+  for(let L=5;L>=1;L--) for(let C=1;C<=5;C++){ const x=g.l+(C-1)*cw, y=g.t+(5-L)*ch, sc=L*C;
+    s+=`<rect x="${x}" y="${y}" width="${cw-2}" height="${ch-2}" fill="${BANDS[band(sc)][2]}"/><text x="${x+4}" y="${y+12}" font-size="10" fill="#4c5459" font-family="ui-monospace,Menlo,monospace">${sc}</text>`; }
+  for(let L=5;L>=1;L--){ const y=g.t+(5-L)*ch; s+=`<text x="${g.l-8}" y="${y+18}" text-anchor="end" font-size="12" font-weight="700" fill="#15191c">L${L}</text><text x="${g.l-8}" y="${y+32}" text-anchor="end" font-size="10.5" fill="#4c5459" font-family="ui-monospace,Menlo,monospace">${lr[5-L]}</text>`; }
+  for(let C=1;C<=5;C++){ const x=g.l+(C-1)*cw+cw/2; s+=`<text x="${x}" y="${H-g.b+16}" text-anchor="middle" font-size="12" font-weight="700" fill="#15191c">C${C}</text><text x="${x}" y="${H-g.b+30}" text-anchor="middle" font-size="10" fill="#4c5459" font-family="ui-monospace,Menlo,monospace">${cr[C-1]}</text>`; }
+  s+=`<text x="${g.l+(W-g.l-g.r)/2}" y="${H-6}" text-anchor="middle" font-size="11" fill="#4c5459">Consequence: ${A.cBasis==='bbl'?'released volume per leak':'cost of one leak'}</text>`;
+  s+=`<text transform="translate(12 ${g.t+ch*2.5}) rotate(-90)" text-anchor="middle" font-size="11" fill="#4c5459">Likelihood: ${A.lBasis==='pof'?`PoF within ${A.lpYears} yr of shut-in`:A.lBasis==='typical'?'time to typical failure':'time to earliest possible failure'}</text>`;
+  const cells={}; PF.forEach(m=>{ const k=m.lk+'_'+m.ck; (cells[k]=cells[k]||[]).push(m); });
+  for(const [k,arr] of Object.entries(cells)){ const [L,C]=k.split('_').map(Number); const x=g.l+(C-1)*cw, y=g.t+(5-L)*ch;
+    const per=Math.max(1,Math.floor((cw-8)/20)), r=arr.length>per*2?6:8;
+    arr.forEach((m,j)=>{ const cx=x+12+(j%per)*(r*2+3), cy=y+ (Math.floor(j/per)===0?ch/2+4:ch/2+4+r*2+2) - (arr.length>per?r:0); const on=m.i===cur;
+      s+=`<g class="pt" data-i="${m.i}" style="cursor:pointer"><circle cx="${cx}" cy="${cy}" r="${on?r+2:r}" fill="${on?'#1d4e63':'#fcfcfb'}" stroke="#1d4e63" stroke-width="1.5"/><text x="${cx}" y="${cy+3.5}" font-size="${r>6?10:8}" font-weight="700" fill="${on?'#fff':'#1d4e63'}" text-anchor="middle">${m.i+1}</text><title>${esc(m.name)}: L${m.lk} x C${m.ck} = ${m.score} (${BANDS[m.band][0]})</title></g>`; }); }
+  host.innerHTML=`<div class="legend">${BANDS.map((b,i)=>`<span><i style="border-color:${b[2]};border-top-width:10px"></i>${b[0]} (${i===0?'<= '+A.rb1:i===1?(A.rb1+1)+'-'+A.rb2:i===2?(A.rb2+1)+'-'+A.rb3:'> '+A.rb3})</span>`).join('')}</div><div class="chost"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="5 by 5 risk matrix with locations placed by likelihood and consequence">${s}</svg></div>`;
+  host.querySelectorAll('g.pt').forEach(e=>e.addEventListener('click',()=>select(+e.dataset.i)));
+  const asc=a=>a.every((v,i)=>i===0||v>a[i-1]);
+  const bad=[];
+  if(!asc([A.lb1,A.lb2,A.lb3,A.lb4])) bad.push('likelihood ranges');
+  if(!asc(A.cBasis==='bbl'?[A.cv1,A.cv2,A.cv3,A.cv4]:[A.cc1,A.cc2,A.cc3,A.cc4])) bad.push('consequence ranges');
+  if(!asc([A.rb1,A.rb2,A.rb3])) bad.push('risk bands');
+  document.getElementById('ranges').innerHTML=bad.length?`<div class="warnline">Check Settings: ${bad.join(', ')} must increase from one level to the next.</div>`:'';
+}
+function dlBars(){
+  const host=document.getElementById('dlbars');
+  const rows=PF.slice().sort((a,b)=>a.rank-b.rank);
+  const W=Math.max(320,host.clientWidth||520), rh=24, bh=12, g={l:190,r:128,t:6,b:40}, H=g.t+g.b+rows.length*rh;
+  const xMax=Math.max(1,...rows.map(m=>m.tLeakW))*1.02, sx=v=>g.l+v/xMax*(W-g.l-g.r);
+  const maxCh=Math.floor((g.l-14)/6.6);
+  let s='';
+  for(const v of niceTicks(0,xMax,5)){const x=sx(v); s+=`<line x1="${x}" x2="${x}" y1="${g.t}" y2="${H-g.b}" stroke="#e4e8e5"/><text x="${x}" y="${H-g.b+15}" text-anchor="middle" font-size="11" fill="#6b7378" font-family="ui-monospace,Menlo,monospace">${v}</text>`;}
+  rows.forEach((m,j)=>{const y=g.t+j*rh, cy=y+rh/2, by=cy-bh/2, on=m.i===cur, lab=`${m.i+1}. ${m.name}`, b=BANDS[m.band];
+    s+=`<g data-i="${m.i}" style="cursor:pointer"><rect x="0" y="${y}" width="${W}" height="${rh}" fill="${on?'#e3edf1':'transparent'}"/>`+
+      `<text x="4" y="${cy}" dominant-baseline="central" text-anchor="start" font-size="11.5" fill="#15191c" ${on?'font-weight="700"':''}>${esc(lab.length>maxCh?lab.slice(0,maxCh-1)+'.':lab)}</text>`+
+      `<rect x="${sx(0)}" y="${by}" width="${Math.max(0,sx(Math.min(m.tp,xMax))-sx(0))}" height="${bh}" fill="#9cc3ec"/>`+
+      `<rect x="${sx(Math.min(m.tp,m.dl))}" y="${by}" width="${Math.max(0,sx(m.dl)-sx(Math.min(m.tp,m.dl)))}" height="${bh}" fill="#2f7d3a"/>`+
+      `<rect x="${sx(m.dl)}" y="${by}" width="${Math.max(0,sx(m.tLeakW)-sx(m.dl))}" height="${bh}" fill="#e9cf9c"/>`+
+      `<text x="${W-g.r+6}" y="${cy}" dominant-baseline="central" font-size="11" fill="#15191c" font-family="ui-monospace,Menlo,monospace">${dateAt(m.dl,m.p)}</text>`+
+      `<rect x="${W-50}" y="${cy-8}" width="46" height="16" rx="3" fill="${b[2]}"/><text x="${W-27}" y="${cy}" dominant-baseline="central" text-anchor="middle" font-size="10.5" font-weight="700" fill="#15191c" font-family="ui-monospace,Menlo,monospace">${m.score}</text>`+
+      `<title>${esc(m.name)}: risk ${m.score} (${b[0]}, rank ${m.rank}); modify by ${dateAt(m.dl,m.p)}; earliest leak ${dateAt(m.tLeakW,m.p)}</title></g>`;});
+  s+=`<text x="${W-g.r+6}" y="${H-g.b+15}" font-size="10.5" fill="#4c5459">Modify by</text><text x="${W-27}" y="${H-g.b+15}" text-anchor="middle" font-size="10.5" fill="#4c5459">Risk</text>`;
+  s+=`<text x="${(g.l+W-g.r)/2}" y="${H-4}" text-anchor="middle" font-size="11" fill="#4c5459">Years after the line goes offline</text>`;
+  host.innerHTML=`<div class="legend"><span><i style="border-color:#9cc3ec;border-top-width:8px"></i>Residual chemical</span><span><i style="border-color:#2f7d3a;border-top-width:8px"></i>Safe deferral</span><span><i style="border-color:#e9cf9c;border-top-width:8px"></i>Reserve to earliest leak</span><span>Ordered by risk, highest first</span></div><div class="chost"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Modification deadline by location, ordered by risk">${s}</svg></div>`;
+  host.querySelectorAll('g[data-i]').forEach(e=>e.addEventListener('click',()=>select(+e.dataset.i)));
+}
+
+/* plain-language description of which rates drive this location (deterministic line and Monte Carlo) */
+function rateUsed(m){ const p=m.p, src=m.RD?(m.RD.own?'this location\'s list':'shared Settings list'):'';
+  const n=m.dN?`normal rate from ${src}${m.nIsMic?' (MIC)':''}: n = ${m.dN.length}, mean ${mean(m.dN).toFixed(1)} mpy${m.mcOn?', Monte Carlo resamples the list':''}`
+    :`normal rate from inputs: ${(m.crNin*1000).toFixed(1)} mpy${m.chem?' (treated x efficiency)':' (no chemical program)'}${m.mcOn?`, Monte Carlo spread COV ${p.covR}`:''}${p.rateSrc==='dist'?' (lists ignored by Settings)':''}`;
+  const st=m.dS?`stagnant rate from ${src}${m.sIsMic?' (MIC)':''}: n = ${m.dS.length}, mean ${mean(m.dS).toFixed(1)} mpy`:`stagnant rate = Y x normal rate`;
+  return n+'; '+st; }
+function mcQ(mc,q){ const k=Math.min(mc.N-1,Math.max(0,Math.ceil(q*mc.N)-1)); return mc.T[k]; }
+function p50Bars(){
+  const host=document.getElementById('p50bars'); if(!host) return;
+  const on=A.useMC!=='no';
+  document.getElementById('p50H').textContent=on?'Schedule: when PoF passes 50%, all locations':'Schedule: typical failure date, all locations (Monte Carlo off)';
+  document.getElementById('p50N').innerHTML=on?`For each location, the calendar date when the Monte Carlo probability of failure (as-entered case) passes 50%, i.e. the median failure date <span class="ref">[18]</span>. The shaded span runs from the 10% PoF date to the 50% date; the tick is the modification deadline. Ordered by the 50% date, earliest first. Click a row to select that location.`:`Monte Carlo is off, so no PoF. The red dot is the deterministic typical failure date (as-entered rates); the tick is the modification deadline. Ordered by failure date, earliest first. Turn Monte Carlo on for the 50% PoF schedule.`;
+  const rows=PF.map(m=>({m,a:m.offDec,t10:m.offDec+mcQ(m.mc,0.1),t50:m.offDec+mcQ(m.mc,0.5),dl:m.offDec+m.dl}))
+    .sort((x,y)=>(isFinite(x.t50)?x.t50:1e9)-(isFinite(y.t50)?y.t50:1e9)||x.m.i-y.m.i);
+  const nd=new Date(), today=nd.getFullYear()+nd.getMonth()/12+(nd.getDate()-1)/365;
+  const fin=v=>isFinite(v)?v:null;
+  let x0=Math.floor(Math.min(today,...rows.map(r=>Math.min(r.a,fin(r.t10)??r.a))));
+  let x1=Math.ceil(Math.max(today+1,...rows.map(r=>Math.max(r.dl,fin(r.t50)??r.a)))+0.5);
+  x1=Math.min(x1,x0+60);
+  const W=Math.max(360,host.clientWidth||900), rh=26, bh=12, sm=W<640, g={l:sm?118:200,r:sm?84:150,t:22,b:40}, H=g.t+g.b+rows.length*rh;
+  const sx=v=>g.l+(Math.min(x1,Math.max(x0,v))-x0)/(x1-x0)*(W-g.l-g.r), maxCh=Math.floor((g.l-14)/6.6);
+  let s='';
+  const step=yearStep(x1-x0,W-g.l-g.r);
+  for(let y=Math.ceil(x0/step)*step;y<=x1+1e-9;y+=step){const x=sx(y); s+=`<line x1="${x}" x2="${x}" y1="${g.t}" y2="${H-g.b}" stroke="#e4e8e5"/><text x="${x}" y="${H-g.b+15}" text-anchor="middle" font-size="11" fill="#6b7378" font-family="ui-monospace,Menlo,monospace">${y}</text>`;}
+  const xt=sx(today); s+=`<line x1="${xt}" x2="${xt}" y1="${g.t-6}" y2="${H-g.b}" stroke="#15191c" stroke-dasharray="3 3"/><text x="${xt}" y="${g.t-10}" text-anchor="middle" font-size="10.5" fill="#15191c">Today</text>`;
+  rows.forEach((r,j)=>{ const m=r.m, y=g.t+j*rh, cy=y+rh/2, by=cy-bh/2, on=m.i===cur, lab=`${m.i+1}. ${m.name}`;
+    const has50=isFinite(r.t50), end=has50?r.t50:x1, xa=sx(r.a), x10=isFinite(r.t10)?sx(r.t10):sx(x1), x50=sx(end), past=has50&&r.t50<=today;
+    const d50=has50?dateAt(mcQ(m.mc,0.5),m.p):'not within '+(x1-x0)+' yr';
+    s+=`<g data-i="${m.i}" style="cursor:pointer"><rect x="0" y="${y}" width="${W}" height="${rh}" fill="${on?'#e3edf1':'transparent'}"/>`+
+      `<text x="4" y="${cy}" dominant-baseline="central" font-size="11.5" fill="#15191c" ${on?'font-weight="700"':''}>${esc(lab.length>maxCh?lab.slice(0,maxCh-1)+'.':lab)}</text>`+
+      `<rect x="${xa}" y="${by}" width="${Math.max(0,x10-xa)}" height="${bh}" fill="#e6ebe8"/>`+
+      `<rect x="${Math.min(x10,x50)}" y="${by}" width="${Math.max(0,x50-x10)}" height="${bh}" fill="#f0b98f"/>`+
+      `<circle cx="${xa}" cy="${cy}" r="3.5" fill="#15191c"/>`+
+      `<line x1="${sx(r.dl)}" x2="${sx(r.dl)}" y1="${by-4}" y2="${by+bh+4}" stroke="#2f7d3a" stroke-width="2.5"/>`+
+      (has50?`<circle cx="${x50}" cy="${cy}" r="6" fill="#b3302d" stroke="#fcfcfb" stroke-width="2"/>`:'')+
+      `<text x="${W-g.r+8}" y="${cy}" dominant-baseline="central" font-size="11" fill="${past?'#b3302d':'#15191c'}" font-weight="${past?700:400}" font-family="ui-monospace,Menlo,monospace">${d50}${past&&!sm?' (past)':''}</text>`+
+      `<title>${esc(m.name)}: ${m.hasSI?'shut-in '+dateAt(0,m.p):'no shut-in date (from today)'}; PoF 10% ${isFinite(r.t10)?dateAt(mcQ(m.mc,0.1),m.p):'not reached'}; PoF 50% ${d50}; modify by ${dateAt(m.dl,m.p)}</title></g>`; });
+  s+=`<text x="${W-g.r+8}" y="${g.t-10}" font-size="10.5" fill="#4c5459">${!on?(sm?'Failure':'Typical failure'):sm?'PoF 50%':'PoF reaches 50%'}</text>`;
+  s+=`<text x="${(g.l+W-g.r)/2}" y="${H-4}" text-anchor="middle" font-size="11" fill="#4c5459">Calendar year</text>`;
+  host.innerHTML=`<div class="legend"><span><i style="border-color:#15191c;border-top-width:6px;width:6px;border-radius:3px"></i>Shut-in (or today if no date)</span>${on?`<span><i style="border-color:#e6ebe8;border-top-width:8px"></i>PoF under 10%</span><span><i style="border-color:#f0b98f;border-top-width:8px"></i>PoF 10% to 50%</span><span><i style="border-color:#b3302d;border-top-width:8px;width:8px;border-radius:4px"></i>PoF passes 50%</span>`:`<span><i style="border-color:#e6ebe8;border-top-width:8px"></i>Before failure</span><span><i style="border-color:#b3302d;border-top-width:8px;width:8px;border-radius:4px"></i>Typical failure</span>`}<span><i style="border-color:#2f7d3a;border-top-width:3px"></i>Modify by</span></div><div class="chost"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Date each location's probability of failure passes 50 percent">${s}</svg></div>`;
+  host.querySelectorAll('g[data-i]').forEach(e=>e.addEventListener('click',()=>select(+e.dataset.i)));
+}
+
+/* ================= tabbed inputs ================= */
+const TABS=[
+  ['Location and facilities','s',[['site','Location name','text'],['pad1Name','Offline pad (Pad 01)','text'],['pad2Name','Producing pad (Pad 02)','text'],['mfhName','Manifold (MFH)','text'],['cfName','Central facility (CF)','text'],['lineName','Stagnant line name','text']]],
+  ['Timing and line','s',[['installYear','Install year','yr','Stage 1 (normal) starts here; nominal wall'],['lowFlow','Low-flow (dynamic dead leg) start','date','Stage 2 starts. Blank = no stage 2'],['off','Shut-in (stagnation) date','date','Stage 3 starts'],['prot','Residual chemical after shut-in','mo','Pads with a program: dead-leg rate continues this long before the stagnant rate. 0 = none [3]'],['wallBasis','Remaining wall from','wbasis'],['wall','Measured remaining wall','%','Used when basis = measured (ILI / UT, worst spot)'],['measDate','Wall measurement date','date','Measured wall is projected forward and back from this date. Blank = shut-in date'],['od','Outside diameter','in'],['wt','Nominal wall','in'],['pMode','MFH pressure profile','pmode'],['press','MFH pressure (constant)','psig','Used when profile = constant'],['pHigh','Peak pressure during vessel dump','psig','Cyclic: gas pushes the vessel liquid into the line'],['pLow','Pressure between dumps','psig','Cyclic'],['dumpMin','Dump duration','min','Cyclic: pressure decays from peak to low over this time'],['cycleMin','Dump interval (cycle time)','min','Cyclic: time from one dump to the next'],['lenMi','Length','mi'],['smys','Grade (SMYS)','psi','For Modified B31G [17]'],['defLen','Corrosion defect axial length','in','For Modified B31G [17]'],['elev','Leak point elevation below MFH','ft','Adds static head [6]']]],
+  ['Production','s',[['q2','Producing pad rate','bbl/d','Feeds a leak; shut in after a leak'],['q1','Non-producing (offline) pad rate','bbl/d','Rate before shut-in; its restart is deferred while the line is repaired'],['days','Shutdown after a leak','days','Applies to both pads'],['value','Value of lost production','$/bbl']]],
+  ['Corrosion rates','s',[['chem','Chemical program','yn','Yes = normal rate CR_n is the treated rate x efficiency factor'],['crTreated','Normal rate with chemical program','mpy','CR_n for pads with a program (coupons / ER / UT) [3][4]'],['chemEff','Chemical efficiency factor','x','Multiplies the treated rate. 1.0 = as measured [3] [A]'],['crUntreated','Normal rate, no chemical program','mpy','CR_n for pads without a program [4]'],['dlX','Dynamic dead leg factor X','x','Stage 2 rate = X x CR_n [A]'],['stY','Stagnant factor Y','x','Stage 3 rate = Y x CR_n [A]'],['micS1','Evidence of MIC: stage 1 normal','yn','Yes = stage 1 rate x M1 [19]'],['mic1','MIC factor M1','x','Applied when stage 1 has evidence of MIC [A]'],['micS2','Evidence of MIC: stage 2 dynamic dead leg','yn','Yes = stage 2 rate x M2 [19]'],['mic2','MIC factor M2','x','Applied when stage 2 has evidence of MIC [A]'],['micS3','Evidence of MIC: stage 3 stagnant','yn','Yes = stage 3 rate x M3 [19]'],['mic3','MIC factor M3','x','Applied when stage 3 has evidence of MIC [A]'],['dataScope','Rate data for this location','dscope','Used when Settings: rates from measured data'],['oNormNo','Own normal rates, no evidence of MIC presence','csv','mpy; replaces CR_n'],['oNormMic','Own normal rates, MIC','csv','mpy; replaces CR_n x MIC factor'],['oStagNo','Own stagnant rates, no evidence of MIC presence (optional)','csv','mpy; replaces Y x CR_n in stage 3'],['oStagMic','Own stagnant rates, MIC (optional)','csv','mpy']]],
+  ['Leak site','s',[['volBasis','Released volume per leak','vbasis'],['volManual','Manual released volume','bbl','Used when volume = manual entry'],['hole','Leak hole diameter','hole'],['cover','Depth of cover','ft'],['soil','Soil type','soil'],['sg','Fluid specific gravity','-'],['visc','Fluid viscosity','cP'],['patrol','Patrol interval','days','Surfaced leak found within this [12]'],['iso','Time to isolate once found','h'],['maxUnd','Leak not surfacing: found within','days','Pressure test / inspection interval']]],
+  ['Costs','s',[['cleanBasis','Cleanup cost basis','basis'],['cleanVal','Cleanup cost','$ or $/bbl','Per the basis selected'],['inclProd','Include lost production in cost','yn','This location only. No = cleanup cost only; lost barrels still shown'],['mod','Modification cost','$']]],
+  ['Settings (all locations)','a',[['_hf','Failure criterion [1][17]','hdr'],['crit','Failure when','crit'],['sfB','Required failure pressure / operating pressure','-','1.0 = fails when Modified B31G burst pressure drops below the peak operating pressure'],
+  ['_hr','Measured corrosion rate data [4]','hdr'],['rateSrc','Corrosion rates from','rsrc'],['worstData','Worst-case stagnant rate from data','wdata','Deterministic deadline'],['dropZeros','Ignore zero values in lists','yn','Yes = 0 mpy entries are treated as no data. Blank entries are always skipped'],['dNormNo','Normal rates, no evidence of MIC presence','csv','mpy, comma separated; replaces CR_n'],['dNormMic','Normal rates, evidence of MIC','csv','mpy; replaces CR_n x MIC factor'],['dStagNo','Stagnant rates, no evidence of MIC presence (optional)','csv','mpy; replaces Y x CR_n in stage 3'],['dStagMic','Stagnant rates, evidence of MIC (optional)','csv','mpy'],
+  ['_hp','Probability of failure: Monte Carlo [18]','hdr'],['useMC','Run Monte Carlo','yn','No = deterministic only: no PoF, deadline from remaining life, likelihood from time to failure. Also on the Locations bar'],['nSim','Simulations','-','1,000 to 20,000'],['covR','Normal rate spread when no rate list (COV)','-','Only used for a line with no measured rate list; 0 = no spread'],['wtCov','Measured wall uncertainty (COV)','-','Used when wall = measured'],
+  ['_hd','Modification deadline','hdr'],['dlBasis','Deadline based on','dlb'],['pofTarget','Maximum PoF at deadline','%','Used when the deadline is PoF-based'],['_h1','Risk matrix: likelihood [15][16]','hdr'],['lBasis','Likelihood based on','lbasis'],['lpYears','PoF period after shut-in','yr','Used when likelihood = PoF'],['pb1','L1 if PoF under','%','Used when likelihood = PoF'],['pb2','L2 if under','%'],['pb3','L3 if under','%'],['pb4','L4 if under (otherwise L5)','%'],['lb1','L5 if time to leak is under','yr'],['lb2','L4 if under','yr'],['lb3','L3 if under','yr'],['lb4','L2 if under (otherwise L1)','yr'],['_h2','Risk matrix: consequence [15][16]','hdr'],['cBasis','Consequence based on','cbasis'],['cc1','C1 if cost of leak under','$'],['cc2','C2 if under','$'],['cc3','C3 if under','$'],['cc4','C4 if under (otherwise C5)','$'],['cv1','C1 if released volume under','bbl','Used when consequence is based on volume'],['cv2','C2 if under','bbl'],['cv3','C3 if under','bbl'],['cv4','C4 if under (otherwise C5)','bbl'],['_h3','Risk bands (score = L x C, 1 to 25)','hdr'],['rb1','Low if score is at most','-'],['rb2','Medium if at most','-'],['rb3','High if at most (otherwise Very high)','-'],['_h4','Model assumptions','hdr'],['fast','Worst-case stagnant rate','x typical','Deterministic deadline, when no data [A]'],['rlf','Remaining-life factor','-','0.5 = defer no more than half the worst-case remaining life [1][2]'],['horizon','Chart and table period','yr'],['cd','Hole discharge coefficient','-','0.61 [5][6]'],['r0','Soil cavity radius at hole','in','Eroded zone the fluid enters [11] [A]'],['fch','Fractured path: share of plume filled','%','Before fluid shows at surface [A]']]]
+];
+let tab=0;
+function fieldHTML([k,lab,u,hint],scope){
+  if(u==='hdr') return `<div class="ph">${refify(lab)}</div>`;
+  const unit=u&&!['date','yn','text','basis','hole','soil','lbasis','cbasis','wbasis','crbasis','vbasis','pmode','crit','dlb','rsrc','wdata','dscope','csv','sfb','optnum'].includes(u)?` <span style="color:var(--muted)">(${u})</span>`:'';
+  const l=`<label for="f_${k}">${lab}${unit}${hint?`<small>${refify(hint)}</small>`:''}</label>`;
+  const at=`id="f_${k}" data-k="${k}" data-scope="${scope}"`;
+  const sel=opts=>`<div class="fld">${l}<select ${at}>${opts.map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select></div>`;
+  if(u==='date') return `<div class="fld">${l}<input ${at} type="date"></div>`;
+  if(u==='text') return `<div class="fld">${l}<input ${at} type="text" maxlength="40"></div>`;
+  if(u==='yn') return sel([['no','No'],['yes','Yes']]);
+  if(u==='soil') return sel(Object.entries(SOILS).map(([v,s])=>[v,s.n]));
+  if(u==='basis') return sel([['fixed','Fixed per leak ($)'],['perbbl','Per bbl released ($/bbl)']]);
+  if(u==='hole') return sel(HOLES.map(h=>[String(h),fHole(h)+' ('+(h*25.4).toFixed(1)+' mm)']));
+  if(u==='wbasis') return sel([['pct','% wall remaining (measured)'],['calc','Calculated: nominal wall from install year through the stages']]);
+  if(u==='pmode') return sel([['const','Constant pressure'],['cyclic','Cyclic (vessel dump)']]);
+  if(u==='vbasis') return sel([['calc','Calculated (leak model)'],['manual','Manual entry']]);
+  if(u==='crbasis') return sel([['life','Baseline life (full wall to zero)'],['accel','Treated rate x acceleration factor']]);
+  if(u==='lbasis') return sel([['worst','Time to failure, worst case'],['typical','Time to failure, typical'],['pof','Probability of failure (Monte Carlo)']]);
+  if(u==='rsrc') return sel([['auto','Measured lists where entered, otherwise inputs'],['dist','Inputs only (ignore the lists)']]);
+  if(u==='optnum') return `<div class="fld">${l}<input ${at} type="number" step="any" placeholder="default"></div>`;
+  if(u==='sfb') return sel([['scale','Normal data x stagnant ratio'],['input','Untreated rate input x acceleration']]);
+  if(u==='wdata') return sel([['p90','P90 of stagnant data'],['max','Maximum of stagnant data'],['factor','Worst-case factor x mean']]);
+  if(u==='dscope') return sel([['shared','Shared lists (Settings)'],['own','This location\'s own lists']]);
+  if(u==='csv') return `<div class="fld wide">${l}<div><textarea ${at} spellcheck="false" placeholder="e.g. 5.2, 7.1, 9.8, 12.4"></textarea><span class="stat" data-stat="${k}"></span></div></div>`;
+  if(u==='crit') return sel([['b31g','Modified B31G burst < required pressure (or 80% depth)'],['leak','Wall reaches zero (through-wall leak)']]);
+  if(u==='dlb') return sel([['rl','Half of worst-case remaining life'],['pof','Latest date PoF stays under the maximum'],['min','Earlier of the two']]);
+  if(u==='cbasis') return sel([['cost','Cost of one leak ($)'],['bbl','Released volume (bbl)']]);
+  return `<div class="fld">${l}<input ${at} type="number" step="any"></div>`;
+}
+function buildTabs(){
+  document.getElementById('tabs').innerHTML=TABS.map((t,i)=>`<button role="tab" id="tab${i}" aria-controls="pan${i}" aria-selected="${i===tab}" tabindex="${i===tab?0:-1}">${t[0]}</button>`).join('');
+  document.getElementById('panels').innerHTML=TABS.map((t,i)=>`<div class="panel" role="tabpanel" id="pan${i}" aria-labelledby="tab${i}" ${i===tab?'':'hidden'}>${t[2].map(f=>fieldHTML(f,t[1])).join('')}</div>`).join('');
+  const tabsEl=[...document.querySelectorAll('[role=tab]')];
+  const show=i=>{tab=i; tabsEl.forEach((b,j)=>{b.setAttribute('aria-selected',j===i);b.tabIndex=j===i?0:-1;document.getElementById('pan'+j).hidden=j!==i;});};
+  tabsEl.forEach((b,i)=>{b.addEventListener('click',()=>show(i)); b.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const n=(i+(e.key==='ArrowRight'?1:tabsEl.length-1))%tabsEl.length; show(n); tabsEl[n].focus();}});});
+  document.querySelectorAll('#panels [data-k]').forEach(el=>el.addEventListener('input',()=>{
+    const k=el.dataset.k, tgt=el.dataset.scope==='a'?A:SITES[cur], d=(el.dataset.scope==='a'?ASM_DEF:SITE_DEF)[k];
+    tgt[k]=typeof d==='number'?(el.value===''?0:parseFloat(el.value)):el.value; save(); run();
+  }));
+}
+function fillInputs(){
+  const s=SITES[cur];
+  document.querySelectorAll('#panels [data-k]').forEach(el=>{ const k=el.dataset.k, v=el.dataset.scope==='a'?A[k]:s[k];
+    if(k==='hole'){ let best=HOLES[0]; for(const h of HOLES) if(Math.abs(h-v)<Math.abs(best-v)) best=h; el.value=String(best); } else el.value=v; });
+}
+
+/* ================= detail views ================= */
+function chart(m){
+  const host=document.getElementById('chart'), p=m.p;
+  const W=Math.max(300,host.clientWidth||560),H=260,g={l:52,r:12,t:12,b:34},H0=Math.max(1,p.horizon);
+  const yMax=Math.max(10,m.tNow*1000*1.08);
+  const sx=t=>g.l+t/H0*(W-g.l-g.r), sy=v=>H-g.b-v/yMax*(H-g.t-g.b);
+  let s=`<rect x="${sx(0)}" y="${g.t}" width="${Math.max(0,sx(Math.min(m.tp,H0))-sx(0))}" height="${H-g.t-g.b}" fill="#e3eef9"/>`;
+  if(m.dl>m.tp) s+=`<rect x="${sx(Math.min(m.tp,H0))}" y="${g.t}" width="${Math.max(0,sx(Math.min(m.dl,H0))-sx(Math.min(m.tp,H0)))}" height="${H-g.t-g.b}" fill="#e6f2e7"/>`;
+  for(const v of niceTicks(0,yMax,5)){const y=sy(v); s+=`<line x1="${g.l}" x2="${W-g.r}" y1="${y}" y2="${y}" stroke="#e4e8e5"/><text x="${g.l-6}" y="${y+4}" text-anchor="end" font-size="11" fill="#6b7378" font-family="ui-monospace,Menlo,monospace">${v}</text>`;}
+  const st=H0>12?2:1;
+  for(let y=0;y<=H0+1e-9;y+=st){const x=sx(y); s+=`<line x1="${x}" x2="${x}" y1="${H-g.b}" y2="${H-g.b+4}" stroke="#9aa2a6"/><text x="${x}" y="${H-g.b+16}" text-anchor="middle" font-size="11" fill="#6b7378" font-family="ui-monospace,Menlo,monospace">${y}</text>`;}
+  s+=`<line x1="${g.l}" x2="${W-g.r}" y1="${H-g.b}" y2="${H-g.b}" stroke="#b3302d" stroke-width="1.5"/><text x="${W-g.r-2}" y="${H-g.b-5}" text-anchor="end" font-size="11" fill="#b3302d">Leak at zero wall</text><text x="${(g.l+W-g.r)/2}" y="${H-3}" text-anchor="middle" font-size="11" fill="#4c5459">Years after the line goes offline</text>`;
+  s+=`<text transform="translate(12 ${(g.t+H-g.b)/2}) rotate(-90)" text-anchor="middle" font-size="11" fill="#4c5459">Remaining wall, mils</text>`;
+  const line=(rate,col)=>{let d='';for(let i=0;i<=200;i++){const t=i/200*H0;d+=(i?'L':'M')+sx(t).toFixed(1)+' '+sy(Math.max(0,m.wallAt(t,rate)*1000)).toFixed(1);}return `<path d="${d}" fill="none" stroke="${col}" stroke-width="2"/>`;};
+  s+=line(m.cr,'#2a78d6')+line(m.crW,'#eb6834');
+  if(m.dl<=H0){const x=sx(m.dl),r=x>W-110; s+=`<line x1="${x}" x2="${x}" y1="${g.t}" y2="${H-g.b}" stroke="#1d4e63" stroke-dasharray="3 3"/><circle cx="${x}" cy="${sy(m.wallAt(m.dl,m.crW)*1000)}" r="5" fill="#1d4e63" stroke="#fcfcfb" stroke-width="2"/><text x="${x+(r?-6:6)}" y="${g.t+12}" text-anchor="${r?'end':'start'}" font-size="11" font-weight="600" fill="#1d4e63">Modify by</text>`;}
+  const leg=`<div class="legend"><span><i style="border-color:#2a78d6"></i>Typical rate (${(m.cr*1000).toFixed(1)} mpy)</span><span><i style="border-color:#eb6834"></i>Worst case (${(m.crW*1000).toFixed(1)} mpy)</span></div>`;
+  host.innerHTML=leg+`<div class="chost"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Remaining wall over time, typical and worst-case corrosion">${s}<line class="hx" y1="${g.t}" y2="${H-g.b}" stroke="#15191c" opacity="0"/><g class="hd"></g><rect class="ov" x="${g.l}" y="${g.t}" width="${W-g.l-g.r}" height="${H-g.t-g.b}" fill="transparent"/></svg><div class="tip" hidden></div></div>`;
+  const svg=host.querySelector('svg'),ov=host.querySelector('.ov'),hx=host.querySelector('.hx'),hd=host.querySelector('.hd'),tip=host.querySelector('.tip');
+  const mv=e=>{const r=svg.getBoundingClientRect(); let t=((e.clientX-r.left)*W/r.width-g.l)/(W-g.l-g.r)*H0; t=Math.max(0,Math.min(H0,Math.round(t*12)/12)); const x=sx(t);
+    const a=Math.max(0,m.wallAt(t,m.cr)*1000), b=Math.max(0,m.wallAt(t,m.crW)*1000);
+    hx.setAttribute('x1',x);hx.setAttribute('x2',x);hx.setAttribute('opacity','.35');
+    hd.innerHTML=`<circle cx="${x}" cy="${sy(a)}" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"/><circle cx="${x}" cy="${sy(b)}" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"/>`;
+    const stx=b<=0?'Leak possible':t<=m.dl?'Safe window':'Past deadline';
+    tip.innerHTML=`<div style="color:#6b7378">${dateAt(t,p)} (${fY(t)})</div>Typical: <b>${a.toFixed(0)} mils</b><br>Worst case: <b>${b.toFixed(0)} mils</b><br>${stx}`; tip.hidden=false;
+    const tx=x*r.width/W,tw=tip.offsetWidth; tip.style.left=(tx+12+tw>r.width?tx-12-tw:tx+12)+'px'; tip.style.top='8px';};
+  ov.addEventListener('mousemove',mv); ov.addEventListener('touchstart',e=>mv(e.touches[0]),{passive:true});
+  ov.addEventListener('mouseleave',()=>{tip.hidden=true;hx.setAttribute('opacity','0');hd.innerHTML='';});
+}
+
+function schematic(m){
+  const p=m.p, L=m.L, S=L.S;
+  const n1=nm(p,'pad1Name','Pad 01'),n2=nm(p,'pad2Name','Pad 02'),nM=nm(p,'mfhName','MFH'),nC=nm(p,'cfName','Central Facility'),nL=nm(p,'lineName','Line 01');
+  const N1=esc(n1),N2=esc(n2),NM=esc(nM),NC=esc(nC),NL=esc(nL);
+  document.getElementById('schemH').textContent=`How ${n1}, ${n2}, ${nM} and ${nC} are connected`;
+  document.getElementById('schemN').textContent=`With no isolation at ${nM}, ${nL} stays pressured by the producing ${n2} system. A hole in ${nL} is fed from ${n2} until someone finds it and isolates it.`;
+  const T=(x,y,t,o={})=>`<text x="${x}" y="${y}" ${o.mw&&String(t).length*(o.s||12)*0.6>o.mw?`textLength="${o.mw}" lengthAdjust="spacingAndGlyphs"`:''} font-size="${o.s||12}" ${o.w?`font-weight="${o.w}"`:''} fill="${o.c||'#15191c'}" text-anchor="${o.a||'start'}" ${o.m?'font-family="ui-monospace,Menlo,monospace"':''}>${t}</text>`;
+  let s=`<defs>
+    <marker id="aB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2a78d6"/></marker>
+    <marker id="aO" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#b86a00"/></marker>
+    <marker id="aK" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#15191c"/></marker>
+    <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="${S.col}"/><line x1="0" y1="0" x2="0" y2="8" stroke="#00000018" stroke-width="3"/></pattern>
+  </defs>`;
+  s+=`<rect x="20" y="28" width="160" height="66" rx="4" fill="#eef0ef" stroke="#9aa2a6" stroke-dasharray="5 3"/>`;
+  s+=T(32,50,N1,{w:700,mw:136})+T(32,68,m.hasSI?'Offline from '+dateAt(0,p):'No shut-in date set',{s:11,c:'#4c5459'})+T(32,84,'was '+Number(p.q1).toLocaleString()+' bbl/d',{s:11,c:'#4c5459',m:1});
+  s+=`<rect x="20" y="214" width="160" height="66" rx="4" fill="#e3eef9" stroke="#2a78d6"/>`;
+  s+=T(32,236,N2,{w:700,mw:136})+T(32,254,'Producing',{s:11,c:'#4c5459'})+T(32,270,Number(p.q2).toLocaleString()+' bbl/d',{s:11,m:1});
+  s+=`<path d="M180 61 H470 V130 H520" fill="none" stroke="#8b949a" stroke-width="7" stroke-dasharray="14 6" stroke-linejoin="round"/>`;
+  s+=T(200,44,`${NL}  ${p.od} in OD x ${p.wt} in WT, ${p.lenMi} mi`,{s:12,w:600,mw:265})+T(200,122,`Rates: ${(m.r1*1000).toFixed(1)} normal / ${(m.r2*1000).toFixed(1)} dead leg / ${(m.r3*1000).toFixed(1)} stagnant mpy`,{s:11,c:'#4c5459',mw:265});
+  s+=`<path d="M455 80 H300" fill="none" stroke="#b86a00" stroke-width="2" marker-end="url(#aO)"/>`;
+  s+=T(200,100,`${NM} pressure ${p.pMode==='cyclic'?p.pLow+'-'+p.pHigh+' psig (cyclic)':p.press+' psig'} backs into ${NL}`,{s:11,c:'#8a5000',mw:255});
+  s+=`<circle cx="250" cy="61" r="9" fill="#b3302d" stroke="#fcfcfb" stroke-width="2"/><text x="250" y="65" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">!</text>`;
+  s+=`<path d="M180 247 H470 V170 H520" fill="none" stroke="#2a78d6" stroke-width="7" stroke-linejoin="round"/>`;
+  s+=`<path d="M260 247 H330" stroke="#fcfcfb" stroke-width="2" marker-end="url(#aB)"/><path d="M380 247 H450" stroke="#fcfcfb" stroke-width="2" marker-end="url(#aB)"/>`;
+  s+=T(200,234,N2+' line',{s:12,w:600,mw:250})+T(200,272,'Flowing to '+NM,{s:11,c:'#4c5459',mw:250});
+  s+=`<g transform="translate(496 130)"><path d="M-10 -8 L0 0 L-10 8 Z M10 -8 L0 0 L10 8 Z" fill="#fcfcfb" stroke="#1d4e63" stroke-width="2"/></g>`;
+  s+=`<path d="M540 92 L503 124" stroke="#1d4e63" stroke-width="1"/>`+T(545,88,'Proposed isolation / blind',{s:11,w:700,c:'#1d4e63'});
+  s+=`<rect x="520" y="112" width="110" height="76" rx="4" fill="#fcfcfb" stroke="#15191c" stroke-width="1.5"/>`;
+  s+=T(575,142,NM,{w:700,a:'middle',mw:100})+T(575,160,'Manifold',{s:11,c:'#4c5459',a:'middle'})+T(575,176,(p.pMode==='cyclic'?p.pLow+'-'+p.pHigh:p.press)+' psig',{s:11,a:'middle',m:1,mw:100});
+  s+=`<path d="M630 150 H666 V232" fill="none" stroke="#15191c" stroke-width="3" marker-end="url(#aK)"/>`;
+  s+=`<rect x="610" y="240" width="100" height="50" rx="4" fill="#eef1ef" stroke="#15191c" stroke-width="1.5"/>`+T(660,262,NC,{w:700,a:'middle',mw:90})+T(660,279,'Central facility',{s:11,c:'#4c5459',a:'middle'});
+  const x0=720,x1=950,gy=64, depthPx=Math.min(150,Math.max(30,p.cover*26)), py=gy+depthPx, pr=Math.max(8,Math.min(20,p.od*1.6)), cx=(x0+x1)/2-30;
+  s+=`<rect x="${x0}" y="14" width="${x1-x0}" height="296" rx="4" fill="#fcfcfb" stroke="#c6cdc8"/>`+T(x0+10,32,'Leak site cross-section',{s:12,w:700});
+  s+=`<rect x="${x0+1}" y="${gy}" width="${x1-x0-2}" height="${306-gy}" fill="url(#hatch)"/>`;
+  s+=`<line x1="${x0}" x2="${x1}" y1="${gy}" y2="${gy}" stroke="#15191c" stroke-width="2"/>`+T(x1-8,gy-6,'Ground',{s:11,a:'end',c:'#4c5459'});
+  if(L.path==='down') s+=`<ellipse cx="${cx}" cy="${py+40}" rx="46" ry="${Math.max(10,Math.min(70,306-py-10))}" fill="#b3302d33"/>`;
+  else { const rp=Math.min(depthPx,cx-x0-2); s+=`<path d="M${cx-rp} ${py} A ${rp} ${depthPx} 0 0 1 ${cx+rp} ${py} Z" fill="#b3302d40"/>`; }
+  s+=`<circle cx="${cx}" cy="${py}" r="${pr}" fill="#8b949a" stroke="#15191c" stroke-width="1.5"/><circle cx="${cx}" cy="${py-pr}" r="3" fill="#b3302d"/>`;
+  if(L.path!=='down') s+=`<path d="M${cx} ${py-pr-4} V${gy+4}" stroke="#b3302d" stroke-width="2" marker-end="url(#aO)"/>`;
+  else s+=`<path d="M${cx} ${py+pr+2} V${Math.min(300,py+pr+50)}" stroke="#b3302d" stroke-width="2" marker-end="url(#aO)"/>`;
+  s+=`<path d="M${x1-24} ${gy} V${py}" stroke="#15191c" stroke-width="1" marker-end="url(#aK)"/>`+T(x1-28,(gy+py)/2+4,p.cover+' ft',{s:11,a:'end',m:1});
+  const ty=Math.min(254,py+pr+30);
+  s+=T(x0+10,ty,`${S.n}, ${fHole(p.hole)} hole, ${m.cyc?Math.round(m.pLo)+'-'+Math.round(m.pHi):Math.round(m.pLoc)} psig`,{s:11,w:600,mw:210})+T(x0+10,ty+16,`${fN(L.qb,1)} bbl/d; ${PATH[L.path].split(';')[0].toLowerCase()}`,{s:11,c:'#4c5459',mw:210})+T(x0+10,ty+32,'Surfaces: '+fT(L.t),{s:11,m:1});
+  document.getElementById('schem').innerHTML=`<svg viewBox="0 0 960 322" role="img" aria-label="Schematic: ${N1} and ${NL} offline, connected at ${NM} to the producing ${N2} line and on to ${NC}, with leak site cross-section">${s}</svg>`;
+}
+
+function leakSection(m){
+  const p=m.p,L=m.L;
+  document.getElementById('leakKV').innerHTML=[
+    ['Leak rate',fN(L.qb,1)+' bbl/d'+(L.capped?' (supply-limited)':'')],['Soil behaviour',PATH[L.path].split(';')[0]],['Time to surface',fT(L.t)],['Found and isolated after',fT(L.tTot)],['Released volume',fN(L.V,1)+' bbl'+(L.manual?' (manual)':'')],['Cleanup cost',f$(m.clean)]
+  ].map(([k,v])=>`<div><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+  const hd=`<tr><th></th><th>Rate (bbl/d)</th><th>Surfaces</th><th>Released (bbl)</th></tr>`;
+  const row=(lab,x,sel)=>`<tr class="${sel?'hl':''}"><td>${lab}</td><td>${fN(x.qb,1)}</td><td>${fT(x.t)}</td><td>${fN(x.V,1)}</td></tr>`;
+  document.getElementById('leakHole').innerHTML=`<table>${hd}${HOLES.map(h=>row(fHole(h),leakCalc(p,p.soil,p.cover,h,m.pr),Math.abs(h-p.hole)<1e-9)).join('')}</table>`;
+  document.getElementById('leakSoil').innerHTML=`<table>${hd}${Object.entries(SOILS).map(([k,S])=>row(S.n,leakCalc(p,k,p.cover,p.hole,m.pr),k===p.soil)).join('')}</table>`;
+  const covers=[...new Set([2,3,4,6,8,p.cover])].sort((a,b)=>a-b);
+  document.getElementById('leakCover').innerHTML=`<table>${hd}${covers.map(c=>row(c+' ft',leakCalc(p,p.soil,c,p.hole,m.pr),c===p.cover)).join('')}</table>`;
+}
+
+function samples(m){
+  const p=m.p,L=m.L, E=[], g=t=>E.push({grp:t}), add=(t,f,sub,r,ref)=>E.push({t,f,s:sub,r,ref});
+  g('Three-stage corrosion rates');
+  const mm=v=>(v*1000).toFixed(2)+' mpy';
+  if(m.RD){ const d=m.RD, st=a=>a.length?`n=${a.length}, mean ${mean(a).toFixed(2)}, P90 ${qtl(a,.9).toFixed(2)}, max ${a[a.length-1].toFixed(2)} mpy`:'none';
+    add('Measured rate data used',`lists from ${d.own?'this location':'Settings (shared)'}; normal: ${d.normIsMic?'MIC list (stage 1 MIC)':m.ev1?'no-MIC list x M1':'no-MIC list'}; stagnant: ${d.stagIsMic?'MIC list (stage 3 MIC)':'no-MIC list'}; typical = mean; Monte Carlo samples values from the lists (bootstrap)`,`normal: ${st(d.norm)}\nstagnant: ${d.stag.length?st(d.stag):'no list: Y x CR_n'}`,`CR_n ${m.dN?mean(m.dN).toFixed(2)+' mpy':'from inputs'}`,'[4][18]'); }
+  add('Normal rate CR_n',m.dN?'CR_n = mean of normal-rate data':m.chem?'CR_n = treated rate x chemical efficiency factor':'CR_n = normal rate without program',m.dN?`mean of ${m.dN.length} values`:m.chem?`${p.crTreated} x ${p.chemEff}`:`${p.crUntreated}`,mm(m.crN),m.chem?'[3][4]':'[4]');
+  if(m.mic) add('MIC by stage','M_i applied only where that stage has evidence of MIC; otherwise 1.0',`${m.nIsMic?'MIC normal data already carries M1, so stages 2 and 3 use M2/M1 and M3/M1':'location value or Settings default'}`,`stage 1 ${m.ev1?'Yes':'No'} ${m.M1.toFixed(2)} / stage 2 ${m.ev2?'Yes':'No'} ${m.M2.toFixed(2)} / stage 3 ${m.ev3?'Yes':'No'} ${m.M3.toFixed(2)}`,'[19] [A]');
+  add('Stage 1 rate: normal operation','r1 = CR_n x M1',`r1 = ${mm(m.crN)} x ${m.k1.toFixed(2)}`,mm(m.r1),'[1][4]');
+  add('Stage 2 rate: dynamic dead leg','r2 = X x CR_n x M2',`r2 = ${m.X} x ${mm(m.crN)} x ${m.k2.toFixed(2)}`,mm(m.r2),'[A] factor X');
+  add('Stage 3 rate: stagnant',m.dS?'r3 = mean of stagnant data x M3':'r3 = Y x CR_n x M3',m.dS?`mean ${mean(m.dS).toFixed(2)} x ${m.Ms.toFixed(2)}`:`r3 = ${m.Y} x ${mm(m.crN)} x ${m.k3.toFixed(2)}`,mm(m.r3),'[A] factor Y');
+  add('Stage periods','Stage 1: install to low-flow start; Stage 2: low-flow start to shut-in (+ residual period); Stage 3: after that',`install ${m.tI.toFixed(2)}, low flow ${m.tLF.toFixed(2)}, shut-in ${m.offDec.toFixed(2)}, residual ${p.prot||0} mo`,`${m.yrsN.toFixed(2)} yr / ${m.yrsD.toFixed(2)} yr / from ${dateAt(m.tp,p)}`,'');
+  if(p.wallBasis==='calc') add('Remaining wall at shut-in (calculated)','t_now = WT - r1 x (t_LF - t_I) - r2 x (t_SI - t_LF)',`t_now = ${p.wt} - ${m.r1.toFixed(5)} x ${m.yrsN.toFixed(2)} - ${m.r2.toFixed(5)} x ${m.yrsD.toFixed(2)}`,`${m.tNow.toFixed(4)} in = ${(m.tNow*1000).toFixed(0)} mils (${m.wallPct.toFixed(0)}%)`,'[1] corrosion rate = metal loss / time');
+  else add('Remaining wall at shut-in (from measurement)','t_now = measured wall - stage losses between measurement date and shut-in',`measured ${p.wall}% x ${p.wt} = ${m.wRef.toFixed(4)} in on ${m.tRef.toFixed(2)}`,`${m.tNow.toFixed(4)} in = ${(m.tNow*1000).toFixed(0)} mils`,'[1]');
+  if(p.crit==='b31g'){ const z=p.defLen*p.defLen/(p.od*p.wt), Mf=z<=50?Math.sqrt(1+0.6275*z-0.003375*z*z):0.032*z+3.3;
+    add('Failure wall (Modified B31G)','P_f = 2 (SMYS + 10 ksi) t / D x (1 - 0.85 d/t) / (1 - 0.85 d/(t M));  M = sqrt(1 + 0.6275 z - 0.003375 z^2), z = L^2/(D t);  solve P_f = SF x P_op for d (d <= 0.8 t)',`z = ${p.defLen}^2 / (${p.od} x ${p.wt}) = ${z.toFixed(3)}, M = ${Mf.toFixed(3)}\nP_op = ${m.pHi.toFixed(0)} psig (peak), SF = ${p.sfB}\nd_crit = ${m.CW.dc.toFixed(4)} in (${m.CW.note})`,`t_crit = ${m.tc.toFixed(4)} in = ${(m.tc*1000).toFixed(0)} mils`,'[17]'); }
+  else add('Failure wall','t_crit = 0 (through-wall leak)','t_crit = 0','0 in','[1] with t_required = 0');
+  add('Worst-case stagnant rate',m.dS||m.dN?(p.worstData==='factor'?'r3_w = N x r3':`r3_w = ${p.worstData==='max'?'maximum':'P90'} of stagnant rates (data)`):'r3_w = N x r3',m.dS||m.dN?`worst basis: ${p.worstData}`:`${p.fast} x ${mm(m.r3)}`,mm(m.crW),'[A]; replace with measured rate [4]');
+  g('Remaining life and deadline');
+  add('Time to failure, typical rate','t = T_r + (t_now - t_crit - r2 T_r) / r3   (from shut-in)',`t = ${m.tp.toFixed(3)} + (${m.tNow.toFixed(4)} - ${m.tc.toFixed(4)} - ${(m.crT*m.tp).toFixed(4)}) / ${m.cr.toFixed(5)}`,`${m.tLeakT.toFixed(2)} yr (${dateAt(m.tLeakT,p)})`,'[1][2]');
+  add('Time to failure, worst case','t = T_r + (t_now - t_crit - r2 T_r) / r3_w',`t = ${m.tp.toFixed(3)} + (${m.tNow.toFixed(4)} - ${m.tc.toFixed(4)} - ${(m.crT*m.tp).toFixed(4)}) / ${m.crW.toFixed(5)}`,`${m.tLeakW.toFixed(2)} yr (${dateAt(m.tLeakW,p)})`,'[1][2]');
+  add('Deadline, remaining-life basis','t_RL = f x t_fail,w   (from shut-in, rounded down to the month)',`t_RL = ${p.rlf} x ${m.tLeakW.toFixed(3)} = ${(p.rlf*m.tLeakW).toFixed(3)} yr`,`${dateAt(m.dlRL,p)} (${fY(m.dlRL)})`,'[1] half-life interval rule');
+  add('Deadline, PoF basis','t_PoF = latest month with P_f(t) <= target',`target = ${p.pofTarget}%`,`${dateAt(m.dlPof,p)} (${fY(m.dlPof)})`,'[18]');
+  add('Modification deadline',p.dlBasis==='rl'?'t_mod = t_RL':p.dlBasis==='pof'?'t_mod = t_PoF':'t_mod = min(t_RL, t_PoF)',`basis: ${p.dlBasis}`,`${dateAt(m.dl,p)} (${fY(m.dl)})`,p.dlBasis==='rl'?'[1]':'[1][18]');
+  add('Wall above failure at deadline (worst case)','= t_now - loss(t_mod) with CR_w - t_crit',`= ${m.tNow.toFixed(4)} - ${m.loss(m.dl,m.crW).toFixed(4)} - ${m.tc.toFixed(4)}`,`${(m.margin*1000).toFixed(0)} mils`,'[1]');
+  g('Probability of failure (Monte Carlo)');
+  add('Simulation set-up','For each of N runs: draw a normal rate (and stagnant rate) from the entered data, apply the location factors X, Y, M1-M3, then t_fail = time for wall to reach t_crit',`N = ${m.mc.N}; rates: ${m.dN?`bootstrap from ${m.dN.length} measured normal rates`:`CR_n with COV ${p.covR} (no rate list)`}${m.dS?`, ${m.dS.length} measured stagnant rates`:''}; X ${m.X}, Y ${m.Y} fixed${p.wallBasis==='pct'?`, wall ${p.wtCov}`:''}; MIC ${m.mic?`M1 ${m.M1}, M2 ${m.M2}, M3 ${m.M3} fixed (stages marked Yes)`:'not applied'}`,`${m.mc.N.toLocaleString()} failure times`,'[18]');
+  add('PoF at deadline','P_f(t_mod) = count(t_fail <= t_mod) / N',`t_mod = ${m.dl.toFixed(3)} yr`,fPct(m.pofAt(m.dl)),'[18]');
+  add(`PoF within ${A.lpYears} yr of shut-in`,'P_f(T) = count(t_fail <= T) / N',`T = ${A.lpYears} yr`,fPct(m.pofAt(A.lpYears)),'[18]');
+  g('Line contents');
+  add('Line inventory','V = ID^2 / 1029.4 x length(ft),  ID = OD - 2 WT',`ID = ${p.od} - 2 x ${p.wt} = ${m.ID.toFixed(3)} in\nV = ${m.ID.toFixed(3)}^2 / 1029.4 x ${(p.lenMi*5280).toFixed(0)} ft`,`${Math.round(m.inv).toLocaleString()} bbl`,'[14]');
+  g(`Design leak: ${fHole(p.hole)} hole, ${L.S.n.toLowerCase()}, ${p.cover} ft cover`);
+  if(m.cyc){ add('Pressure at leak point (cyclic)','P_peak = P_dump + 0.433 SG dz;  P_low = P_between + 0.433 SG dz',`P_peak = ${p.pHigh} + 0.433 x ${p.sg} x ${p.elev||0} = ${m.pHi.toFixed(1)}\nP_low = ${p.pLow} + ${m.head.toFixed(1)} = ${m.pLo.toFixed(1)}`,`${m.pLo.toFixed(0)} to ${m.pHi.toFixed(0)} psig`,'[6]');
+    add('Dump fraction of cycle','f = dump duration / cycle time',`f = ${p.dumpMin} / ${p.cycleMin}`,`${(m.fDump*100).toFixed(1)}%`,''); }
+  else add('Pressure at leak point','P = P_MFH + 0.433 x SG x dz',`P = ${p.press} + 0.433 x ${p.sg} x ${p.elev||0} ft`,`${m.pLoc.toFixed(1)} psig`,'[6]');
+  add('Overburden stress','sv = gamma x h',`sv = ${L.S.gam} kN/m3 x ${L.h.toFixed(3)} m`,`${(L.sv/1000).toFixed(2)} kPa = ${(L.sv/PSI).toFixed(2)} psi`,'[9]');
+  if(m.cyc) add('Time-averaged driving pressure','mean sqrt(dP) = f x (2/3)(dP_pk^1.5 - dP_lo^1.5)/(dP_pk - dP_lo) + (1 - f) x sqrt(dP_lo);  dP_eq = (mean sqrt dP)^2   (linear decay during dump)',`dP_pk = ${(L.dPhi/1000).toFixed(1)} kPa, dP_lo = ${(L.dPlo/1000).toFixed(1)} kPa, f = ${m.fDump.toFixed(3)}\nmean sqrt(dP) = ${m.fDump.toFixed(3)} x ${L.sRamp.toFixed(1)} + ${(1-m.fDump).toFixed(3)} x ${Math.sqrt(L.dPlo).toFixed(1)} = ${L.sAvg.toFixed(1)}`,`dP_eq = ${(L.dP/1000).toFixed(1)} kPa (equivalent constant ${m.pEff.toFixed(0)} psig)`,'[5][6] leak rate goes with sqrt(dP)');
+  else add('Pressure across hole','dP = P - sv',`dP = ${m.pLoc.toFixed(1)} x 6894.76 - ${L.sv.toFixed(0)} Pa`,`${(L.dP/1000).toFixed(1)} kPa`,'[5][6]');
+  add('Orifice leak rate','Q = Cd x A x sqrt(2 dP / rho),  A = pi d^2 / 4',`A = pi x (${p.hole.toFixed(5)} x 0.0254)^2 / 4 = ${L.A.toExponential(3)} m2\nrho = ${p.sg} x 1000 = ${L.rho} kg/m3\nQ = ${p.cd} x ${L.A.toExponential(3)} x sqrt(2 x ${L.dP.toFixed(0)} / ${L.rho}) = ${L.Qo.toExponential(3)} m3/s`+(L.capped?`\nCapped at producing-pad supply ${p.q2} bbl/d`:'')+(m.cyc?`\nPeak during dump = ${fN(L.Qpk*BPD,2)} bbl/d (used for the soil fracture check)`:''),`${fN(L.qb,2)} bbl/d${m.cyc?' average':''}`,'[5][6]');
+  add('Soil permeability for this fluid','k = K_water x mu_w / (rho_w g);  K_f = k rho g / mu',`K_water = ${L.S.K.toExponential(0)} m/s (${L.S.n.toLowerCase()})\nk = ${L.S.K.toExponential(0)} x 0.001 / (1000 x 9.81) = ${L.k.toExponential(3)} m2\nK_f = ${L.k.toExponential(3)} x ${L.rho} x 9.81 / ${L.mu}`,`${L.Kf.toExponential(3)} m/s`,'[5][7]');
+  add('Flow soil takes before fracturing','Q_s = 4 pi k r0 (sv + c) / mu   (Darcy, spherical source)',`Q_s = 4 pi x ${L.k.toExponential(3)} x ${L.r0.toFixed(4)} x (${L.sv.toFixed(0)} + ${L.S.c*1000}) / ${L.mu}`,`${fN(L.Qs*BPD,3)} bbl/d -> ${L.Q>L.Qs?'leak exceeds it: soil fractures':'soil accepts it'}`,'[8][10][11]');
+  add('Gravity drainage below the plume','Q_d = K_f x pi h^2   (Darcy, unit gradient)',`Q_d = ${L.Kf.toExponential(3)} x pi x ${L.h.toFixed(3)}^2`,`${fN(L.Qd*BPD,3)} bbl/d`,'[7] [A] plume footprint radius = cover');
+  add('Pore volume to reach surface','Vp = n (1 - Sr) x (2/3) pi h^3',`Vp = ${L.S.por} x (1 - ${L.S.sr}) x (2/3) pi x ${L.h.toFixed(3)}^3`,`${L.Vp.toFixed(3)} m3 = ${(L.Vp*6.2898).toFixed(2)} bbl`,'[5][7] [A] hemispherical plume');
+  const tf=L.path==='frac'?`t = f x Vp / Q = ${p.fch}% x ${L.Vp.toFixed(3)} / ${L.Q.toExponential(3)} / 86400`:L.path==='fill'?`t = Vp / (Q - Q_d) = ${L.Vp.toFixed(3)} / (${L.Q.toExponential(3)} - ${L.Qd.toExponential(3)}) / 86400`:'Q <= Q_d and Q <= Q_s: fluid drains downward';
+  add('Time to surface','fractured: t = f Vp / Q;  filling: t = Vp / (Q - Q_d);  else does not surface',tf,fT(L.t),'[10][11] [A] fill fraction');
+  if(L.manual) add('Released volume (manual entry)','V = manual entry',`V = ${p.volManual} bbl (leak model gives ${fN(L.Vcalc,1)} bbl)`,`${fN(L.V,1)} bbl`,'');
+  else add('Released volume','V = Q x (t_surface + patrol + isolate)   or   Q x (max undetected + isolate)',isFinite(L.t)?`V = ${fN(L.qb,2)} bbl/d x (${L.t.toFixed(3)} + ${p.patrol} + ${p.iso}/24) d`:`V = ${fN(L.qb,2)} bbl/d x (${p.maxUnd} + ${p.iso}/24) d`,`${fN(L.V,1)} bbl`,'[5][12][13]');
+  g('Cost of a leak and risk (L x C)');
+  add('Cleanup cost',p.cleanBasis==='perbbl'?'= $/bbl x released volume':'= fixed cost per leak',p.cleanBasis==='perbbl'?`= ${p.cleanVal} x ${fN(L.V,1)}`:`= ${Number(p.cleanVal).toLocaleString()}`,f$(m.clean),'[5]');
+  add('Lost production per leak','bbl = days x (producing pad + non-producing pad);  $ = bbl x value',`bbl = ${p.days} x (${Number(p.q2).toLocaleString()} + ${Number(p.q1).toLocaleString()}) = ${Math.round(m.prodBbl).toLocaleString()} bbl
+$ = ${Math.round(m.prodBbl).toLocaleString()} x ${p.value}`,`${Math.round(m.prodBbl).toLocaleString()} bbl = ${f$(m.prod)}`,'[5]');
+  add('Cost of one leak',m.inclProd?'C = cleanup + lost production':'C = cleanup   (lost production excluded for this location)',m.inclProd?`C = ${Math.round(m.clean).toLocaleString()} + ${Math.round(m.prod).toLocaleString()}`:`C = ${Math.round(m.clean).toLocaleString()}`,f$(m.C),'[5]');
+  if(A.lBasis==='pof') add('Likelihood category','L = 1 if PoF < '+A.pb1+'%; 2 if < '+A.pb2+'%; 3 if < '+A.pb3+'%; 4 if < '+A.pb4+'%; else 5   (Settings)',`PoF within ${A.lpYears} yr = ${fPct(m.pofL)}`,`L${m.lk}`,'[15][16][18]');
+  else add('Likelihood category','L = 5 if t < '+A.lb1+'; 4 if t < '+A.lb2+'; 3 if t < '+A.lb3+'; 2 if t < '+A.lb4+'; else 1   (t in years, Settings)',`t = ${A.lBasis==='typical'?'time to typical failure':'time to earliest possible failure'} = ${m.tL.toFixed(2)} yr`,`L${m.lk}`,'[15][16]');
+  add('Consequence category',(A.cBasis==='bbl'?`C = 1 if V < ${A.cv1}; 2 if < ${A.cv2}; 3 if < ${A.cv3}; 4 if < ${A.cv4}; else 5   (bbl, Settings)`:`C = 1 if cost < ${f$(A.cc1)}; 2 if < ${f$(A.cc2)}; 3 if < ${f$(A.cc3)}; 4 if < ${f$(A.cc4)}; else 5   (Settings)`),`${A.cBasis==='bbl'?'released volume':'cost of one leak'} = ${fC(m.cv)}`,`C${m.ck}`,'[15][16]');
+  add('Risk of failure','Risk = L x C;  band: Low <= '+A.rb1+', Medium <= '+A.rb2+', High <= '+A.rb3+', else Very high',`Risk = ${m.lk} x ${m.ck}`,`${m.score} (${BANDS[m.band][0]}; rank ${m.rank} of ${PF.length})`,'[15][16]');
+  document.getElementById('samples').innerHTML=E.map(e=>e.grp?`<div class="grp">${esc(e.grp)}</div>`:`<details><summary><span>${e.t} ${e.ref?refify(e.ref.replace(/;.*$/,'').replace(/ [a-z].*$/,'')):''}</span><span>${e.r}</span></summary><div class="b"><div><i>Formula</i><code>${e.f}${e.ref?'   '+refify(e.ref):''}</code></div><div><i>Inputs</i><code>${e.s}</code></div><div><i>Result</i><code>${e.r}</code></div></div></details>`).join('');
+}
+
+/* ================= projection + PoF charts ================= */
+const SCN=[{k:'no',n:'No evidence of MIC presence',sh:'No evidence of MIC presence',c:'#2a78d6',f:'rgba(42,120,214,0.16)',ov:{micS1:'no',micS2:'no',micS3:'no'}},
+  {k:'as',n:'Evidence of MIC by stage, as entered',sh:'Assessed',c:'#4a3aa7',f:'rgba(74,58,167,0.16)',ov:null},
+  {k:'yes',n:'Evidence of MIC presence, all stages',sh:'Evidence of MIC, all stages',c:'#eb6834',f:'rgba(235,104,52,0.18)',ov:{micS1:'yes',micS2:'yes',micS3:'yes'}}];
+function scenarios(m){ const base=ctx(SITES[m.i]); const key=[m.ev1,m.ev2,m.ev3].map(v=>v?'y':'n').join(''); const asK=key==='nnn'?'no':key==='yyy'?'yes':'as';
+  return SCN.filter(sc=>sc.k!=='as'||asK==='as').map(sc=>Object.assign({},sc,{m:sc.ov?model(Object.assign({},base,sc.ov)):m,on:sc.k===asK,n:sc.k===asK&&sc.k!=='as'?sc.n:sc.n,
+    sh:sc.k==='as'?`Assessed (evidence of MIC, stage ${[m.ev1?'1':'',m.ev2?'2':'',m.ev3?'3':''].filter(Boolean).join(',')})`:sc.sh})); }
+/* x-axis range: from install (or earliest known date) to past the latest event of any case (capped at 40 yr after shut-in) */
+function yrRange(m,SC,pofOnly){ const p=m.p; const ms=(SC&&SC.length?SC.map(sc=>sc.m):[m]);
+  const y0=pofOnly?Math.floor(m.offDec):Math.floor(Math.min(m.tI,m.tRef,isFinite(m.tLF)?m.tLF:m.tI,m.offDec-1));
+  let ev=m.offDec+Math.max(1,p.horizon);
+  for(const k of ms){ for(const t of [k.tFailAbs,k.offDec+k.tLeakT,k.offDec+k.tLeakW,k.offDec+k.dl]) if(isFinite(t)) ev=Math.max(ev,Math.min(t,m.offDec+40)); }
+  return [y0,Math.ceil(ev+0.5)]; }
+function yearStep(span,px){ const want=span/Math.max(1,px/48); for(const s of [1,2,5,10,20]) if(s>=want) return s; return 50; }
+function wallSample(sm,sp,p,t){ // t = years after shut-in (negative = before)
+  const y=sm.offDec+t; if(y<sm.tI) return null; const Ls=sm.stag?mkLoss(sm.tI,sm.tLF,sm.tR,sp.r1,sp.r2,sp.r3):mkLoss(sm.tI,sm.tLF,Infinity,sp.r1,sp.r2,0); return sp.wRef-(Ls.Lc(y)-Ls.Lc(sm.tRef)); }
+function projChart(m,SC){
+  const host=document.getElementById('proj'), p=m.p, [y0,y1]=yrRange(m,SC);
+  const W=Math.max(320,host.clientWidth||900),H=340,g={l:58,r:14,t:30,b:40};
+  const NP=160, xs=Array.from({length:NP+1},(_,i)=>y0+(y1-y0)*i/NP);
+  // pass 1: compute central line and P10/P90 band for each case, so the y-axis can scale to all of it
+  const DATA=SC.map(sc=>{ const sm=sc.m, smp=sm.mc.samples, pts=[];
+    xs.forEach(y=>{ const t=y-sm.offDec; const v=[]; for(const sp of smp){ const w=wallSample(sm,sp,p,t); if(w!=null) v.push(Math.max(0,w)); } if(!v.length) return; v.sort((a,b)=>a-b);
+      pts.push({y,lo:v[Math.floor(0.1*(v.length-1))],hi:v[Math.floor(0.9*(v.length-1))],c:y<sm.tI?null:Math.max(0,sm.wallAbs(y))}); });
+    return pts; });
+  let vMax=Math.max(p.wt,m.tc); DATA.forEach(pts=>pts.forEach(q=>{ vMax=Math.max(vMax,q.hi,q.c||0); }));
+  const tk=niceTicks(0,vMax*1000*1.04,5), yMax=Math.max(vMax*1000*1.04,tk[tk.length-1]);
+  const sx=y=>g.l+(y-y0)/(y1-y0)*(W-g.l-g.r), sy=v=>H-g.b-Math.max(0,v)/yMax*(H-g.t-g.b);
+  let s='';
+  for(const v of tk){const y=sy(v); s+=`<line x1="${g.l}" x2="${W-g.r}" y1="${y}" y2="${y}" stroke="#e4e8e5"/><text x="${g.l-6}" y="${y+4}" text-anchor="end" font-size="11" fill="#6b7378" font-family="ui-monospace,Menlo,monospace">${(v/1000).toFixed(3)}</text>`;}
+  const step=yearStep(y1-y0,W-g.l-g.r); for(let y=Math.ceil(y0/step)*step;y<=y1+1e-9;y+=step){const x=sx(y); s+=`<line x1="${x}" x2="${x}" y1="${g.t}" y2="${H-g.b}" stroke="#eef1ef"/><text x="${x}" y="${H-g.b+15}" text-anchor="middle" font-size="11" fill="#6b7378" font-family="ui-monospace,Menlo,monospace">${y}</text>`;}
+  const xE=W-g.r, xo=sx(m.offDec), xl=isFinite(m.tLF)?sx(Math.min(y1,Math.max(y0,m.tLF))):xE, xa=sx(Math.max(y0,m.tI));
+  const x2e=m.hasSI?xo:xE;
+  s+=`<rect x="${xl}" y="${g.t}" width="${Math.max(0,x2e-xl)}" height="${H-g.t-g.b}" fill="#fbf4e6"/>`+(m.hasSI?`<rect x="${xo}" y="${g.t}" width="${Math.max(0,xE-xo)}" height="${H-g.t-g.b}" fill="#f1f3f2"/>`:'');
+  const lab=(x1,x2,t)=>{ const alt={'2. DYNAMIC DEAD LEG':['2. DEAD LEG','2'],'1. NORMAL':['1'],'3. STAGNANT':['3']}[t]||[]; for(const c of [t,...alt]) if(x2-x1>c.length*6.6+10){ t=c; break; } return x2-x1>t.length*6.6+10?`<text x="${(x1+x2)/2}" y="${g.t-9}" text-anchor="middle" font-size="10.5" fill="#4c5459" letter-spacing=".05em">${t}</text>`:''; };
+  s+=lab(xa,xl,'1. NORMAL')+lab(xl,x2e,'2. DYNAMIC DEAD LEG')+(m.hasSI?lab(xo,xE,'3. STAGNANT'):'');
+  const bands=[], lines=[], ptLab=[];
+  SC.forEach((sc,si)=>{ const sm=sc.m; let top='',bot=[],cen='';
+    DATA[si].forEach(q=>{ const x=sx(q.y).toFixed(1);
+      top+=(top?'L':'M')+x+' '+sy(q.hi*1000).toFixed(1); bot.push(x+' '+sy(q.lo*1000).toFixed(1));
+      if(q.c!=null) cen+=(cen?'L':'M')+x+' '+sy(q.c*1000).toFixed(1); });
+    if(top&&sm.mcOn) bands.push(`<path d="${top}L${bot.reverse().join('L')}Z" fill="${sc.f}"/>`);
+    lines.push(`<path d="${cen}" fill="none" stroke="${sc.c}" stroke-width="${sc.on?3:2}" ${sc.on?'':'stroke-dasharray="6 4"'}/>`);
+    const yv=sm.tNow*1000; lines.push(`<circle cx="${xo}" cy="${sy(yv)}" r="4" fill="${sc.c}" stroke="#fcfcfb" stroke-width="1.5"/>`);
+    ptLab.push({y:sy(yv)+4,c:sc.c,t:`${sc.sh}: ${sm.tNow.toFixed(3)} in`}); });
+  s+=bands.join('')+lines.join('');
+  const yc=sy(m.tc*1000); s+=`<line x1="${g.l}" x2="${W-g.r}" y1="${yc}" y2="${yc}" stroke="#b3302d" stroke-dasharray="5 4" stroke-width="1.5"/><text x="${W-g.r-4}" y="${yc-5}" text-anchor="end" font-size="11" fill="#b3302d" paint-order="stroke" stroke="#fcfcfb" stroke-width="4" stroke-linejoin="round">Failure: ${p.crit==='b31g'?`Modified B31G, WT <= ${m.tc.toFixed(3)} in`:'wall reaches zero'}</text>`;
+  s+=`<line x1="${xo}" x2="${xo}" y1="${g.t}" y2="${H-g.b}" stroke="#1d4e63" stroke-dasharray="4 3" stroke-width="1.5"/>`;
+  const HALO='paint-order="stroke" stroke="#fcfcfb" stroke-width="4" stroke-linejoin="round"';
+  const xd=sx(m.offDec+m.dl); if(m.dl<=y1-m.offDec){ const mt=`Modify by ${dateAt(m.dl,p)}`, rt=xd+8+mt.length*6.6>W-g.r;
+    s+=`<line x1="${xd}" x2="${xd}" y1="${g.t+4}" y2="${H-g.b}" stroke="#2f7d3a" stroke-width="1.5"/><text x="${rt?xd-5:xd+5}" y="${g.t+14}" text-anchor="${rt?'end':'start'}" font-size="11" font-weight="600" fill="#2f7d3a" ${HALO}>${mt}</text>`; }
+  // wall-at-stagnation labels: left of the marker, spaced so they never overlap each other or the x-axis
+  ptLab.sort((a,b)=>a.y-b.y); const top=g.t+26, bot=H-g.b-6, gap=15;
+  ptLab.forEach((q,i)=>{ q.y=Math.max(q.y,top,i?ptLab[i-1].y+gap:top); });
+  for(let i=ptLab.length-1;i>=0;i--){ const lim=i===ptLab.length-1?bot:ptLab[i+1].y-gap; if(ptLab[i].y>lim) ptLab[i].y=lim; }
+  const lft=xo-10<g.l+140; // too close to the left edge: put labels right of the marker
+  ptLab.forEach(q=>{ s+=`<text x="${lft?xo+10:xo-10}" y="${q.y}" text-anchor="${lft?'start':'end'}" font-size="11" font-weight="600" fill="${q.c}" ${HALO}>${q.t}</text>`; });
+  s+=`<line x1="${g.l}" x2="${W-g.r}" y1="${H-g.b}" y2="${H-g.b}" stroke="#9aa2a6"/><text x="${(g.l+W-g.r)/2}" y="${H-4}" text-anchor="middle" font-size="11" fill="#4c5459">Calendar year</text><text transform="translate(13 ${(g.t+H-g.b)/2}) rotate(-90)" text-anchor="middle" font-size="11" fill="#4c5459">Remaining wall thickness (in)</text>`;
+  const leg=`<div class="legend">${SC.map(sc=>`<span><i style="border-color:${sc.c};border-top-width:3px"></i>${sc.n}${sc.on?' (assessed)':''}: central</span>${m.mcOn?`<span><i style="border-color:${sc.f};border-top-width:9px"></i>P10-P90 band</span>`:''}`).join('')}<span><i class="dash" style="border-color:#1d4e63"></i>${m.hasSI?'Stagnation begins '+dateAt(0,p):'Today, '+dateAt(0,p)+' (no shut-in date: line assumed still flowing, no stagnant stage)'}</span></div>`;
+  host.innerHTML=leg+`<div class="chost"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Wall-thinning projection with uncertainty bands, with and without evidence of MIC presence">${s}</svg></div>`;
+  document.getElementById('projH').textContent=m.mcOn?'Wall-thinning projection with uncertainty':'Wall-thinning projection (deterministic, Monte Carlo off)';
+  document.getElementById('projN').innerHTML=`<b>Rates used:</b> ${rateUsed(m)}.<br>Central lines: deterministic model (X ${p.dlX}, Y ${p.stY}; MIC factors M1 ${p.mic1}, M2 ${p.mic2}, M3 ${p.mic3}, applied per stage by case). `+(m.mcOn?`Bands: 10th to 90th percentile of ${m.mc.N.toLocaleString()} Monte Carlo trajectories${p.wallBasis==='pct'?` (plus wall COV ${p.wtCov})`:''}. `:'No bands: Monte Carlo is off. ')+`The worst-case line used for the deadline (${p.fast}x) is not drawn ${R(1,18)}.`;
+}
+/* compare the planned shut-in (stage 3 stagnant) with keeping the line in dynamic dead leg service (stage 2 continues) */
+function modeCompare(m){
+  const p=m.p, card=document.getElementById('modeCard');
+  const mD=model(Object.assign({},ctx(SITES[m.i]),{opMode:'dl'}));
+  const C=[{n:'Shut in, stagnant (as planned)',h:'Shut in',c:'#4a3aa7',m},{n:'Kept in dynamic dead leg',h:'Dead leg',c:'#c47d0e',m:mD}];
+  const nL=esc(nm(p,'lineName','Line 01'));
+  if(!m.hasSI){ document.getElementById('modeChart').innerHTML=''; document.getElementById('modeTbl').innerHTML='';
+    document.getElementById('modeN').innerHTML='No shut-in date is entered, so the line is already modelled as still flowing at its current-stage rate. Enter a shut-in date to compare the two operating modes.'; return; }
+  const on=m.mcOn, host=document.getElementById('modeChart');
+  if(on){
+    const [a0,a1]=yrRange(m,[{m},{m:mD}],true), y0=a0, y1=a1;
+    const W=Math.max(320,host.clientWidth||520),H=300,g={l:46,r:12,t:18,b:40};
+    const sx=y=>g.l+(y-y0)/(y1-y0)*(W-g.l-g.r), sy=v=>H-g.b-v*(H-g.t-g.b);
+    let s='';
+    for(const v of [0,.2,.4,.6,.8,1]){const y=sy(v); s+=`<line x1="${g.l}" x2="${W-g.r}" y1="${y}" y2="${y}" stroke="#e4e8e5"/><text x="${g.l-6}" y="${y+4}" text-anchor="end" font-size="11" fill="#6b7378" font-family="ui-monospace,Menlo,monospace">${v*100}%</text>`;}
+    const step=yearStep(y1-y0,W-g.l-g.r); for(let y=Math.ceil(y0/step)*step;y<=y1+1e-9;y+=step){const x=sx(y); s+=`<text x="${x}" y="${H-g.b+15}" text-anchor="middle" font-size="11" fill="#6b7378" font-family="ui-monospace,Menlo,monospace">${y}</text>`;}
+    const xo=sx(m.offDec); s+=`<line x1="${xo}" x2="${xo}" y1="${g.t}" y2="${H-g.b}" stroke="#1d4e63" stroke-dasharray="4 3"/>`;
+    C.forEach(c=>{ let d=''; for(let i=0;i<=200;i++){ const y=y0+(y1-y0)*i/200; d+=(i?'L':'M')+sx(y).toFixed(1)+' '+sy(pofAt(c.m.mc,y-c.m.offDec)).toFixed(1);} s+=`<path d="${d}" fill="none" stroke="${c.c}" stroke-width="2.5"/>`; });
+    s+=`<line x1="${g.l}" x2="${W-g.r}" y1="${H-g.b}" y2="${H-g.b}" stroke="#9aa2a6"/><text x="${(g.l+W-g.r)/2}" y="${H-4}" text-anchor="middle" font-size="11" fill="#4c5459">Calendar year</text>`;
+    host.innerHTML=`<div class="legend">${C.map(c=>`<span><i style="border-color:${c.c};border-top-width:3px"></i>${c.n}</span>`).join('')}<span><i class="dash" style="border-color:#1d4e63"></i>Planned shut-in ${dateAt(0,p)}</span></div><div class="chost"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Probability of failure, shut in versus kept in dynamic dead leg">${s}</svg></div>`;
+  } else host.innerHTML='<p class="note">Monte Carlo is off: no PoF curves. Deterministic results are in the table.</p>';
+  const q50=k=>{ const t=mcQ(k.mc,0.5); return isFinite(t)?dateAt(t,p):'not reached'; };
+  const rows=[
+    ['Rate after '+dateAt(0,p),k=>(k.cr*1000).toFixed(1)+' mpy'],
+    ['Worst-case rate',k=>(k.crW*1000).toFixed(1)+' mpy'],
+    ['Earliest possible failure',k=>dateAt(k.tLeakW,p)],
+    ['Typical failure',k=>dateAt(k.tLeakT,p)],
+    ['Modify by',k=>dateAt(k.dl,p)],
+    ...(on?[
+    ['PoF at '+dateAt(m.dl,p)+' (shut-in modify-by)',k=>fPct(k.pofAt(m.dl))],
+    ['PoF 1 yr after '+dateAt(0,p),k=>fPct(k.pofAt(1))],
+    ['PoF 3 yr after',k=>fPct(k.pofAt(3))],
+    ['PoF 5 yr after',k=>fPct(k.pofAt(5))],
+    ['PoF passes 50%',q50]]:[])];
+  document.getElementById('modeTbl').innerHTML=`<table><tr><th class="l" style="white-space:normal">From ${dateAt(0,p)}</th>${C.map(c=>`<th style="white-space:nowrap"><span class="swatch" style="background:${c.c}"></span>${c.h}</th>`).join('')}</tr>${rows.map(r=>`<tr><td class="l">${r[0]}</td>${C.map(c=>`<td>${r[1](c.m)}</td>`).join('')}</tr>`).join('')}</table>`;
+  document.getElementById('modeN').innerHTML=`Same location, rates and MIC evidence as entered; only what happens after ${dateAt(0,p)} changes. Shut in: residual period${m.tp>0?` (${p.prot} mo)`:''} then the stagnant rate (stage 3). Dynamic dead leg: ${nL} stays in low-flow service and stage 2 continues at r2 = X x CR_n${m.ev2?` x M2`:''} (X ${m.X}) with no stagnant stage${m.hasLF?'':'; no low-flow date is entered, so stage 2 is taken to start on the planned shut-in date'}. ${on?`PoF from ${m.mc.N.toLocaleString()} Monte Carlo runs per mode ${R(18)}.`:''}`;
+}
+function pofChart(m,SC){
+  const card=document.getElementById('pofCard'); card.hidden=!m.mcOn; if(!m.mcOn) return;
+  const host=document.getElementById('pofChart'), p=m.p, [y0,y1]=yrRange(m,SC,true);
+  const W=Math.max(320,host.clientWidth||520),H=300,g={l:46,r:12,t:18,b:40};
+  const sx=y=>g.l+(y-y0)/(y1-y0)*(W-g.l-g.r), sy=v=>H-g.b-v*(H-g.t-g.b);
+  let s='';
+  for(const v of [0,.2,.4,.6,.8,1]){const y=sy(v); s+=`<line x1="${g.l}" x2="${W-g.r}" y1="${y}" y2="${y}" stroke="#e4e8e5"/><text x="${g.l-6}" y="${y+4}" text-anchor="end" font-size="11" fill="#6b7378" font-family="ui-monospace,Menlo,monospace">${v*100}%</text>`;}
+  const step=yearStep(y1-y0,W-g.l-g.r); for(let y=Math.ceil(y0/step)*step;y<=y1+1e-9;y+=step){const x=sx(y); s+=`<text x="${x}" y="${H-g.b+15}" text-anchor="middle" font-size="11" fill="#6b7378" font-family="ui-monospace,Menlo,monospace">${y}</text>`;}
+  const xo=sx(m.offDec); s+=`<line x1="${xo}" x2="${xo}" y1="${g.t}" y2="${H-g.b}" stroke="#1d4e63" stroke-dasharray="4 3"/>`;
+  if(p.dlBasis!=='rl'){ const yt=sy(p.pofTarget/100); s+=`<line x1="${g.l}" x2="${W-g.r}" y1="${yt}" y2="${yt}" stroke="#15191c" stroke-dasharray="4 4"/><text x="${W-g.r-2}" y="${yt-4}" text-anchor="end" font-size="11" fill="#15191c">Max PoF ${p.pofTarget}%</text>`; }
+  const xd=sx(m.offDec+m.dl); if(m.dl<=y1-m.offDec) s+=`<line x1="${xd}" x2="${xd}" y1="${g.t}" y2="${H-g.b}" stroke="#2f7d3a" stroke-width="1.5"/><text x="${xd+4}" y="${g.t+12}" font-size="11" font-weight="600" fill="#2f7d3a">Modify by</text>`;
+  const NP=200;
+  SC.forEach(sc=>{ let d=''; for(let i=0;i<=NP;i++){ const y=y0+(y1-y0)*i/NP; d+=(i?'L':'M')+sx(y).toFixed(1)+' '+sy(pofAt(sc.m.mc,y-sc.m.offDec)).toFixed(1);} s+=`<path d="${d}" fill="none" stroke="${sc.c}" stroke-width="${sc.on?3:2}" ${sc.on?'':'stroke-dasharray="6 4"'}/>`; });
+  s+=`<line x1="${g.l}" x2="${W-g.r}" y1="${H-g.b}" y2="${H-g.b}" stroke="#9aa2a6"/><text x="${(g.l+W-g.r)/2}" y="${H-4}" text-anchor="middle" font-size="11" fill="#4c5459">Calendar year</text>`;
+  const leg=`<div class="legend">${SC.map(sc=>`<span><i style="border-color:${sc.c};border-top-width:3px" class="${sc.on?'':'dash'}"></i>${sc.n}${sc.on?' (assessed)':''}</span>`).join('')}</div>`;
+  host.innerHTML=leg+`<div class="chost"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative probability of failure by year, with and without evidence of MIC presence">${s}<line class="hx" y1="${g.t}" y2="${H-g.b}" stroke="#15191c" opacity="0"/><g class="hd"></g><rect class="ov" x="${g.l}" y="${g.t}" width="${W-g.l-g.r}" height="${H-g.t-g.b}" fill="transparent"/></svg><div class="tip" hidden></div></div>`;
+  const svg=host.querySelector('svg'),ov=host.querySelector('.ov'),hx=host.querySelector('.hx'),hd=host.querySelector('.hd'),tip=host.querySelector('.tip');
+  const mv=e=>{const r=svg.getBoundingClientRect(); let y=y0+((e.clientX-r.left)*W/r.width-g.l)/(W-g.l-g.r)*(y1-y0); y=Math.max(y0,Math.min(y1,y)); const x=sx(y);
+    hx.setAttribute('x1',x);hx.setAttribute('x2',x);hx.setAttribute('opacity','.35');
+    hd.innerHTML=SC.map(sc=>`<circle cx="${x}" cy="${sy(pofAt(sc.m.mc,y-sc.m.offDec))}" r="4" fill="${sc.c}" stroke="#fcfcfb" stroke-width="2"/>`).join('');
+    const mo=Math.floor((y%1)*12); tip.innerHTML=`<div style="color:#6b7378">${MON[mo]} ${Math.floor(y)}</div>`+SC.map(sc=>`<div><span class="swatch" style="background:${sc.c}"></span>${sc.n}: <b>${fPct(pofAt(sc.m.mc,y-sc.m.offDec))}</b></div>`).join(''); tip.hidden=false;
+    const tx=x*r.width/W,tw=tip.offsetWidth; tip.style.left=(tx+12+tw>r.width?tx-12-tw:tx+12)+'px'; tip.style.top='8px';};
+  ov.addEventListener('mousemove',mv); ov.addEventListener('touchstart',e=>mv(e.touches[0]),{passive:true});
+  ov.addEventListener('mouseleave',()=>{tip.hidden=true;hx.setAttribute('opacity','0');hd.innerHTML='';});
+  let t=`<table><tr><th>By end of year</th>${SC.map(sc=>`<th><span class="swatch" style="background:${sc.c}"></span>${sc.sh}${sc.on?' *':''}</th>`).join('')}</tr>`;
+  for(let y=Math.floor(m.offDec);y<=Math.ceil(y1)-1;y++){ t+=`<tr class="${y===Math.floor(m.offDec+m.dl)?'hl':''}"><td>${y}</td>${SC.map(sc=>{const v=pofAt(sc.m.mc,y+1-sc.m.offDec); return `<td>${fPct(v)} <span style="color:var(--muted)">(${Math.round(v*sc.m.mc.N).toLocaleString()})</span></td>`;}).join('')}</tr>`; }
+  document.getElementById('pofTbl').innerHTML=t+`</table><p class="note">Cumulative PoF by end of each year; failed simulations of ${m.mc.N.toLocaleString()} in brackets. * assessed case. Highlighted: year of the modify-by date.</p>`;
+  document.getElementById('pofN').innerHTML=`P_f(t) = P[wall(t) <= t_crit] from ${m.mc.N.toLocaleString()} Monte Carlo trajectories ${R(18)}. Failure = ${p.crit==='b31g'?`Modified B31G failure pressure below ${p.sfB} x peak operating pressure (${Math.round(m.pHi)} psig), i.e. WT <= ${m.tc.toFixed(3)} in, or 80% depth ${R(17)}`:'wall reaches zero (through-wall leak)'}. Sampled: ${m.dN?`normal rate drawn from ${m.dN.length} entered values`:`normal rate CR_n ${(m.crN*1000).toFixed(1)} mpy with COV ${p.covR} (no rate list entered)`}${m.dS?`, stagnant rate from ${m.dS.length} entered values`:''}${p.wallBasis==='pct'?`, measured wall COV ${p.wtCov}`:''}. Factors X ${m.X}, Y ${m.Y}${m.mic?`, MIC M1 ${m.M1} / M2 ${m.M2} / M3 ${m.M3}`:''} are fixed for this location. PoF at modify-by (${dateAt(m.dl,p)}): <b>${fPct(m.pofAt(m.dl))}</b>.`;
+}
+
+function detail(m){
+  const p=m.p, nL=esc(nm(p,'lineName','Line 01')), name=esc(m.name);
+  document.getElementById('sticky').innerHTML=`<span>Showing location ${m.i+1}: <b>${name}</b></span><span>Modify by <b>${dateAt(m.dl,p)}</b></span><span>Risk <b>L${m.lk} x C${m.ck} = ${m.score}</b> ${BANDS[m.band][0]} (rank ${m.rank} of ${PF.length})</span>`;
+  document.getElementById('editing').innerHTML=`Editing location ${m.i+1}: <b>${name}</b>. Changes apply to this location only, except the Settings tab, which applies to all locations.`;
+  let cls,big,why;
+  if(m.noRate){cls='crit';big=`No corrosion rate available`;why=!(m.cr>1e-6)?'No stagnant rate: the rate inputs are 0 and no measured data applies. Enter a rate or data so the model does not assume 0 mpy.':'Remaining wall is calculated from install year, but the rate before shut-in is 0 and no normal-rate data applies. Enter a rate, data, or a measured % wall.';}
+  else if(m.tNow<=m.tc){cls='crit';big=`Modify ${nL} now`;why=p.crit==='b31g'?`Wall at shut-in (${(m.tNow*1000).toFixed(0)} mils) is already at or below the Modified B31G failure wall (${(m.tc*1000).toFixed(0)} mils).`:'No wall left at the worst spot.';}
+  else{ cls=m.dl<1?'warn':'ok'; big=`Modify ${nL} by ${dateAt(m.dl,p)}`;
+    why=`${fY(m.dl)} ${m.hasSI?'after the line goes offline':'from today (no shut-in date entered, so the line is treated as still flowing at its current-stage rate and no stagnant stage is modelled)'}. At the worst-case rate (${(m.crW*1000).toFixed(1)} mpy) the ${(m.tNow*1000).toFixed(0)} mils of wall would reach ${p.crit==='b31g'?`the failure condition (Modified B31G, ${(m.tc*1000).toFixed(0)} mils wall)`:'zero'} in ${dateAt(m.tLeakW,p)}. ${p.dlBasis==='rl'?`Deferring only ${Math.round(p.rlf*100)}% of that remaining life`:p.dlBasis==='pof'?`Keeping PoF at or under ${p.pofTarget}%`:`The earlier of half remaining life and PoF <= ${p.pofTarget}%`} leaves ${(m.margin*1000).toFixed(0)} mils above the failure wall on the deadline.${m.mcOn?` PoF at the deadline: ${fPct(m.pofAt(m.dl))}.`:' Monte Carlo is off: deadline from remaining life only.'}`; }
+  document.getElementById('answer').innerHTML=`<div class="answer ${cls}"><div class="loc">Location ${m.i+1}: ${name} &nbsp;<span class="chip ${BANDS[m.band][1]}">RISK ${m.score} ${BANDS[m.band][0].toUpperCase()}</span></div><div class="big">${big}</div><div class="why">${why}</div></div>`;
+  const pts=[['Goes offline',0,'#15191c'],...(m.tp>0?[['Residual chemical gone',m.tp,'#2a78d6']]:[]),['Modify by',m.dl,'#1d4e63'],['Earliest possible failure',m.tLeakW,'#eb6834'],['Typical failure',m.tLeakT,'#b3302d']].sort((a,b)=>a[1]-b[1]);
+  const span=Math.max(0.5,...pts.map(x=>x[1]));
+  let tl=`<div class="axis"></div><div class="prot" style="width:${Math.min(100,m.tp/span*100)}%"></div>`;
+  if(m.dl>m.tp) tl+=`<div class="safe" style="left:${m.tp/span*100}%;width:${(m.dl-m.tp)/span*100}%"></div>`;
+  pts.forEach((x,i)=>{const up=i%2===1; const dot=`<div class="dot" style="background:${x[2]}"></div>`, txt=`<div class="dt">${dateAt(x[1],p)}</div><div class="lb">${x[0]}</div>`; tl+=`<div class="pt${up?' up':''}" style="left:${x[1]/span*100}%">${up?txt+dot:dot+txt}</div>`;});
+  document.getElementById('tl').innerHTML=tl;
+  document.getElementById('facts').innerHTML=[
+    ['Wall left to lose',(m.tNow*1000).toFixed(0)+' mils',`${m.wallPct.toFixed(0)}% of ${p.wt} in at shut-in${p.wallBasis==='calc'?' (calculated through stages 1 and 2)':' (from measurement)'}; fails at ${(m.tc*1000).toFixed(0)} mils (${p.crit==='b31g'?'Modified B31G':'zero wall'})`],
+    ['Rates by stage',(m.r1*1000).toFixed(1)+' / '+(m.r2*1000).toFixed(1)+' / '+(m.r3*1000).toFixed(1)+' mpy',`Normal / dynamic dead leg (x${m.X}) / stagnant (x${m.Y})${m.mic?`, MIC by stage x${m.M1}/${m.M2}/${m.M3}`:', no evidence of MIC presence'}; worst stagnant ${(m.crW*1000).toFixed(1)} mpy`],
+    ['Time to failure',fY(m.rlW),`Worst case, from shut-in (typical ${fY(m.rlT)})`],['PoF at modify-by',fPct(m.pofAt(m.dl)),`Monte Carlo; ${fPct(m.pofAt(A.lpYears))} within ${A.lpYears} yr of shut-in`],
+    ['Design leak',fN(m.L.qb,1)+' bbl/d',`${fHole(p.hole)} hole; ${fN(m.L.V,1)} bbl released${m.L.manual?' (manual)':''}`],
+    ['Cost of one leak',f$(m.C),m.inclProd?`Cleanup ${f$(m.clean)} + lost production ${f$(m.prod)}`:`Cleanup only; lost production (${f$(m.prod)}) excluded`]
+  ].map(([k,v,d])=>`<div class="fact"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join('');
+  document.getElementById('calc').innerHTML=[
+    `${p.crit==='b31g'?`Failure = Modified B31G failure pressure below ${p.sfB} x peak operating pressure (${Math.round(m.pHi)} psig) for a ${p.defLen} in long defect in ${p.smys.toLocaleString()} psi pipe: wall at or below <b>${(m.tc*1000).toFixed(0)} mils</b> ${R(17)}`:'Failure = wall corroded to zero (through-wall leak)'}. Wall at shut-in = ${p.wallBasis==='calc'?`${p.wt} in - ${(m.r1*1000).toFixed(1)} mpy x ${m.yrsN.toFixed(1)} yr (normal) - ${(m.r2*1000).toFixed(1)} mpy x ${m.yrsD.toFixed(1)} yr (dynamic dead leg)`:`${p.wall}% x ${p.wt} in measured, projected to shut-in`} = <b>${(m.tNow*1000).toFixed(0)} mils</b> ${R(1)}.`,
+    `Three-stage rates: normal CR_n = <b>${(m.crN*1000).toFixed(1)} mpy</b>${m.dN?` (mean of ${m.dN.length} measured values)`:m.chem?` (treated ${p.crTreated} x efficiency ${p.chemEff})`:' (no chemical program)'}${m.mic?`, MIC (stage 1 ${m.ev1?'x'+m.M1:'no'}, stage 2 ${m.ev2?'x'+m.M2:'no'}, stage 3 ${m.ev3?'x'+m.M3:'no'}) ${R(19)}`:''}; dynamic dead leg x${m.X} = <b>${(m.r2*1000).toFixed(1)} mpy</b>; stagnant ${m.dS?'(measured data)':`x${m.Y}`} = <b>${(m.r3*1000).toFixed(1)} mpy</b>; worst-case stagnant <b>${(m.crW*1000).toFixed(1)} mpy</b> <span class="ref">[A]</span>.`,
+    `Time to failure from shut-in: typical <b>${fY(m.rlT)}</b> (${dateAt(m.tLeakT,p)}), worst case <b>${fY(m.rlW)}</b> (${dateAt(m.tLeakW,p)}) ${R(1,2)}.`,
+    `Deadline = ${p.dlBasis==='rl'?`${p.rlf} x worst-case time to failure (half-life interval rule ${R(1)})`:p.dlBasis==='pof'?`latest month with Monte Carlo PoF <= ${p.pofTarget}% ${R(18)}`:`earlier of ${p.rlf} x worst-case life (${dateAt(m.dlRL,p)}) and PoF <= ${p.pofTarget}% (${dateAt(m.dlPof,p)})`} = <b>${dateAt(m.dl,p)}</b>. Worst-case wall above the failure wall on that date: <b>${(m.margin*1000).toFixed(0)} mils</b>; PoF <b>${fPct(m.pofAt(m.dl))}</b>.`,
+    `If a leak did occur: ${fHole(p.hole)} hole at ${m.cyc?`${Math.round(m.pLo)} to ${Math.round(m.pHi)} psig cyclic (dump ${p.dumpMin} of every ${p.cycleMin} min; equivalent ${Math.round(m.pEff)} psig)`:Math.round(m.pLoc)+' psig'} gives <b>${fN(m.L.qb,1)} bbl/d</b>${m.cyc?' on average':''} ${R(5,6)}, surfacing in ${fT(m.L.t)} ${R(10,11)}; <b>${fN(m.L.V,1)} bbl</b> released${m.L.manual?' (manual entry)':` ${R(5,12)}`}; cost <b>${f$(m.C)}</b>.`,
+    `Risk of failure = likelihood x consequence ${R(15,16)}: ${A.lBasis==='pof'?`PoF within ${A.lpYears} yr ${fPct(m.pofL)}`:`time to ${A.lBasis==='typical'?'typical':'earliest possible'} failure ${fY(m.tL)}`} gives <b>L${m.lk}</b>; ${A.cBasis==='bbl'?'released volume':'cost of one leak'} ${fC(m.cv)} gives <b>C${m.ck}</b>; risk = <b>${m.score}</b> (${BANDS[m.band][0]}, rank ${m.rank} of ${PF.length}).`
+  ].map(x=>`<li>${x}</li>`).join('');
+  const S=[['Modify now',p.mod,'None','Not applicable',f$(p.mod),true],[`Modify by ${dateAt(m.dl,p)}`,p.mod,'None (worst case)',`${(m.margin*1000).toFixed(0)} mils left at deadline`,f$(p.mod),true],['Never modify',0,`As early as ${dateAt(m.tLeakW,p)}`,`Typically ${dateAt(m.tLeakT,p)}`,`${f$(m.C)} per leak, then modify`,false]];
+  document.getElementById('scen').innerHTML=`<table><tr><th>Option</th><th>Modification cost</th><th>Leak before modification</th><th>Wall / leak timing</th><th>Cost exposure</th><th>Acceptable?</th></tr>`+
+    S.map((r,i)=>`<tr class="${i===1?'hl':''}"><td>${r[0]}</td><td>${f$(r[1])}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td><span class="chip ${r[5]?'ok':'crit'}">${r[5]?'YES':'NO'}</span></td></tr>`).join('')+
+    `</table><p class="note">Highlighted: recommended latest date. Deferring to the deadline costs the same modification but keeps a worst-case wall reserve.</p>`;
+  let t=`<table><tr><th>Modify by</th><th>Months offline</th><th>Wall above failure, worst case (mils)</th><th>Wall above failure, typical (mils)</th><th>PoF</th><th>Status</th></tr>`;
+  const hlY=Math.floor(m.dl*2+1e-9)/2;
+  for(let mo=0;mo<=p.horizon*12;mo+=6){const y=mo/12,w=m.wallAt(y,m.crW)-m.tc,a=m.wallAt(y,m.cr)-m.tc;
+    const s=y<=m.dl+1e-9?['ok','SAFE']:w>0?['warn','NO MARGIN']:a>0?['crit','FAILURE POSSIBLE']:['crit','FAILURE EXPECTED'];
+    t+=`<tr class="${Math.abs(y-hlY)<1e-6?'hl':''}"><td>${dateAt(y,p)}</td><td>${mo}</td><td>${Math.max(0,w*1000).toFixed(0)}</td><td>${Math.max(0,a*1000).toFixed(0)}</td><td>${fPct(m.pofAt(y))}</td><td><span class="chip ${s[0]}">${s[1]}</span></td></tr>`;
+    if(a<=0) break;}
+  document.getElementById('tbl').innerHTML=t+`</table><p class="note">SAFE: inside the deferral window. NO MARGIN: wall left but the ${Math.round(p.rlf*100)}% remaining-life reserve is used. FAILURE POSSIBLE: worst-case wall reaches the failure wall. FAILURE EXPECTED: typical-rate wall reaches it. PoF: Monte Carlo cumulative probability of failure.</p>`;
+  const SC=scenarios(m); schematic(m); leakSection(m); samples(m); projChart(m,SC); pofChart(m,SC); modeCompare(m);
+}
+
+/* ================= export / import ================= */
+const FMETA={}; TABS.forEach(t=>t[2].forEach(([k,lab,u])=>{ if(u!=='hdr') FMETA[k]={lab,u}; }));
+const csvCell=v=>{ const t=String(v??''); return /[",\n\r]/.test(t)?'"'+t.replace(/"/g,'""')+'"':t; };
+function exportCSV(){
+  const sk=Object.keys(SITE_DEF), ak=Object.keys(ASM_DEF);
+  const L=[];
+  L.push('# Line 01 Deferral Risk input export,'+new Date().toISOString().slice(0,10));
+  L.push('# SETTINGS (apply to all locations)');
+  L.push('setting,value,description');
+  for(const k of ak) L.push([k,A[k],(FMETA[k]?FMETA[k].lab+(FMETA[k].u&&FMETA[k].u.length<14&&!['csv','rsrc','wdata','dscope','crit','dlb','lbasis','cbasis','yn'].includes(FMETA[k].u)?' ('+FMETA[k].u+')':''):'')].map(csvCell).join(','));
+  L.push('# LOCATIONS (one row per location; up to '+MAXS+')');
+  L.push(sk.map(csvCell).join(','));
+  L.push('#'+sk.map(k=>csvCell(FMETA[k]?FMETA[k].lab+(FMETA[k].u&&!['text','date','yn','soil','basis','hole','csv','dscope','wbasis','vbasis','pmode'].includes(FMETA[k].u)?' ('+FMETA[k].u+')':''):'')).join(','));
+  L.push('#options: pMode = const / cyclic; wallBasis = pct / calc; volBasis = calc / manual; soil = '+Object.keys(SOILS).join(' / ')+'; hole (in) = 1/64 / 1/32 / 1/16 / 1/8 / 1/4; chem = yes / no; cleanBasis = fixed / perbbl; off = YYYY-MM-DD');
+  for(const st of SITES) L.push(sk.map(k=>k==='hole'?fHole(st[k]).replace(' in',''):st[k]).map(csvCell).join(','));
+  return L.join('\r\n');
+}
+function parseCSV(t){
+  const rows=[]; let row=[], f='', q=false;
+  for(let i=0;i<t.length;i++){ const c=t[i];
+    if(q){ if(c==='"'){ if(t[i+1]==='"'){f+='"';i++;} else q=false; } else f+=c; }
+    else if(c==='"') q=true; else if(c===','){row.push(f);f='';} else if(c==='\n'||c==='\r'){ if(c==='\r'&&t[i+1]==='\n') i++; row.push(f); rows.push(row); row=[]; f=''; } else f+=c; }
+  if(f!==''||row.length){row.push(f);rows.push(row);}
+  return rows;
+}
+function normVal(k,v,def,warn,where){
+  v=String(v??'').trim(); if(v==='') return def;
+  if(k==='hole'){ const x=v.replace(/in|"/gi,'').trim(); let n=x.includes('/')?(()=>{const [a,b]=x.split('/').map(Number);return a/b;})():parseFloat(x); if(!isFinite(n)||n<=0){warn.push(`${where}: hole "${v}" not understood; default used`);return def;} let best=HOLES[0]; for(const h of HOLES) if(Math.abs(h-n)<Math.abs(best-n)) best=h; return best; }
+  if(k==='soil'){ const key=v.toLowerCase().replace(/[^a-z]/g,''); if(SOILS[key]) return key; const hit=Object.entries(SOILS).find(([kk,S])=>S.n.toLowerCase().replace(/[^a-z]/g,'')===key); if(hit) return hit[0]; warn.push(`${where}: soil "${v}" not understood; default used`); return def; }
+  if(k==='restart'||k==='chem') return /^y/i.test(v)?'yes':'no';
+  if(k==='cleanBasis') return /bbl|barrel|per/i.test(v)?'perbbl':'fixed';
+  if(k==='pMode') return /cyc|dump/i.test(v)?'cyclic':'const';
+  if(k==='volBasis') return /man/i.test(v)?'manual':'calc';
+  if(k==='wallBasis') return /calc|install/i.test(v)?'calc':'pct';
+  if(k==='crBasis') return /acc/i.test(v)?'accel':'life';
+  if(k==='inclProd') return /^n/i.test(v)?'no':'yes';
+  if(k==='lBasis') return /pof|prob/i.test(v)?'pof':/typ/i.test(v)?'typical':'worst';
+  if(k==='dropZeros') return /^n/i.test(v)?'no':'yes';
+  if(k==='stagFallback') return /inp/i.test(v)?'input':'scale';
+  if(k==='rateSrc') return /^(dist|input)/i.test(v)&&!/meas|list/i.test(v)?'dist':'auto';
+  if(k==='useMC') return /^(n|off|0|false)/i.test(v)?'no':'yes';
+  if(k==='worstData') return /max/i.test(v)?'max':/fact/i.test(v)?'factor':'p90';
+  if(k==='dataScope') return /own|loc/i.test(v)?'own':'shared';
+  if(k==='crit') return /leak|zero/i.test(v)?'leak':'b31g';
+  if(k==='dlBasis') return /min/i.test(v)?'min':/pof|prob/i.test(v)?'pof':'rl';
+  if(k==='mic'||k==='micS1'||k==='micS2'||k==='micS3') return /^y/i.test(v)?'yes':'no';
+  if(k==='cBasis') return /bbl|vol/i.test(v)?'bbl':'cost';
+  if(k==='off'||k==='lowFlow'||k==='measDate'){ if(/^\d{4}-\d{2}-\d{2}$/.test(v)) return v; const m=v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/); if(m){ const y=m[3].length===2?'20'+m[3]:m[3]; return `${y}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`; } const d=new Date(v); if(!isNaN(d)) return d.toISOString().slice(0,10); warn.push(`${where}: date "${v}" not understood; default used`); return def; }
+  if(typeof def==='number'){ const n=parseFloat(v.replace(/[$,%\s]/g,'')); if(!isFinite(n)){ warn.push(`${where}: ${k} "${v}" is not a number; default used`); return def; } return n; }
+  return v;
+}
+function importCSV(text){
+  const rows=parseCSV(text.replace(/^\uFEFF/,'')); const warn=[];
+  let mode=null, header=null; const newA=Object.assign({},A); let gotA=false; const newS=[];
+  for(const r of rows){
+    const first=(r[0]||'').trim();
+    if(first.startsWith('#')){ const u=first.toUpperCase(); if(u.includes('SETTINGS')) {mode='a';header=null;} else if(u.includes('LOCATIONS')) {mode='s';header=null;} continue; }
+    if(r.every(c=>String(c).trim()==='')) continue;
+    if(mode==='a'){ if(first.toLowerCase()==='setting') continue; if(first in ASM_DEF){ newA[first]=normVal(first,r[1],ASM_DEF[first],warn,'Settings'); gotA=true; } else warn.push(`Settings: "${first}" is not a known setting; ignored`); continue; }
+    if(mode===null&&r.map(c=>c.trim()).includes('site')) mode='s';
+    if(mode==='s'){ if(!header){ header=r.map(c=>c.trim()); const unk=header.filter(h=>h&&!(h in SITE_DEF)); if(unk.length) warn.push('Unknown columns ignored: '+unk.join(', ')); continue; }
+      if(newS.length>=MAXS){ warn.push(`Only the first ${MAXS} locations were imported`); break; }
+      const o=Object.assign({},SITE_DEF); header.forEach((h,j)=>{ if(h in SITE_DEF) o[h]=normVal(h,r[j],SITE_DEF[h],warn,`Row ${newS.length+1}`); });
+      if(!o.site||o.site===SITE_DEF.site) o.site='Location '+(newS.length+1);
+      newS.push(o); }
+  }
+  if(!newS.length) return {ok:false,msg:'No locations found. The file needs a header row that includes a "site" column.'};
+  return {ok:true,A:newA,S:newS,gotA,warn};
+}
+let undoState=null;
+function showPanel(id){ for(const x of ['xPanel','iPanel']) document.getElementById(x).hidden=x!==id; }
+document.getElementById('bExp').addEventListener('click',()=>{ document.getElementById('xText').value=exportCSV(); document.getElementById('xMsg').textContent=''; showPanel('xPanel'); });
+document.getElementById('xClose').addEventListener('click',()=>showPanel(null));
+let DL=null; (async()=>{ try{ if(window.claude&&window.claude.use) DL=await window.claude.use('downloads'); }catch(e){ DL=null; } })();
+document.getElementById('xDl').addEventListener('click',async()=>{
+  const t=document.getElementById('xText').value, msg=document.getElementById('xMsg'), fn='line01_deferral_inputs_'+new Date().toISOString().slice(0,10)+'.csv';
+  if(DL){ try{ await DL.save({filename:fn,data:t}); msg.className='msg ok'; msg.textContent='Saved.'; }catch(e){ msg.className='msg'; msg.textContent=e&&e.code==='declined'?'Save cancelled.':'Download not available here. Use Copy and save the text as a .csv file.'; } return; }
+  try{ const url=URL.createObjectURL(new Blob([t],{type:'text/csv'})); const a=document.createElement('a'); a.href=url; a.download=fn; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),2000);
+    msg.className='msg'; msg.textContent='If no file was saved (downloads are blocked on the hosted page), use Copy and save the text as a .csv file.'; }
+  catch(e){ msg.className='msg err'; msg.textContent='Download not available here. Use Copy instead.'; }
+});
+document.getElementById('xCopy').addEventListener('click',()=>{
+  const ta=document.getElementById('xText'), msg=document.getElementById('xMsg');
+  const fb=()=>{ ta.focus(); ta.select(); try{ document.execCommand('copy'); msg.className='msg ok'; msg.textContent='Copied.'; }catch(e){ msg.className='msg'; msg.textContent='Text selected. Press Cmd+C to copy.'; } };
+  try{ navigator.clipboard.writeText(ta.value).then(()=>{msg.className='msg ok';msg.textContent='Copied.';},fb); }catch(e){ fb(); }
+});
+document.getElementById('bImp').addEventListener('click',()=>{ document.getElementById('iMsg').textContent=''; showPanel('iPanel'); });
+document.getElementById('iClose').addEventListener('click',()=>showPanel(null));
+document.getElementById('iFile').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ document.getElementById('iText').value=r.result; const m=document.getElementById('iMsg'); m.className='msg'; m.textContent=`Loaded ${f.name}. Press Import and recalculate.`; }; r.readAsText(f); });
+document.getElementById('iGo').addEventListener('click',()=>{
+  const msg=document.getElementById('iMsg'), res=importCSV(document.getElementById('iText').value||'');
+  if(!res.ok){ msg.className='msg err'; msg.textContent=res.msg; return; }
+  undoState={A:JSON.parse(JSON.stringify(A)),S:JSON.parse(JSON.stringify(SITES)),cur};
+  if(res.gotA) A=res.A; SITES=res.S; cur=0; save(); fillInputs(); run();
+  document.getElementById('iUndo').hidden=false;
+  msg.className='msg ok'; msg.textContent=`Imported ${SITES.length} location${SITES.length>1?'s':''}${res.gotA?' and settings':''}. Recalculated.`+(res.warn.length?' Warnings: '+res.warn.slice(0,6).join('; ')+(res.warn.length>6?` (+${res.warn.length-6} more)`:''):'');
+  if(res.warn.length) msg.className='msg';
+});
+document.getElementById('iUndo').addEventListener('click',()=>{ if(!undoState) return; A=undoState.A; SITES=undoState.S; cur=undoState.cur; undoState=null; save(); fillInputs(); run(); document.getElementById('iUndo').hidden=true; const m=document.getElementById('iMsg'); m.className='msg ok'; m.textContent='Import undone.'; });
+
+/* ================= control ================= */
+function dataStats(){ document.querySelectorAll('[data-stat]').forEach(el=>{ const k=el.dataset.stat, v=k[0]==='d'?A[k]:SITES[cur][k], a=parseList(v);
+  el.textContent=a.length?`n = ${a.length}; mean ${mean(a).toFixed(1)}; P10 ${qtl(a,.1).toFixed(1)} / P50 ${qtl(a,.5).toFixed(1)} / P90 ${qtl(a,.9).toFixed(1)}; max ${a[a.length-1].toFixed(1)} mpy`:(String(v||'').trim()?'No valid numbers found':'Empty: inputs + distributions are used for this set'); if(A.rateSrc!=='data') el.textContent+=' (not used: Settings > Corrosion rates from = inputs)'; else if(k[0]==='o'&&SITES[cur].dataScope!=='own') el.textContent+=' (not used: this location uses the shared lists)'; }); }
+function readAll(){ const st=SITES[cur];
+  document.querySelectorAll('#panels [data-k]').forEach(el=>{ const k=el.dataset.k, a=el.dataset.scope==='a', tgt=a?A:st, d=(a?ASM_DEF:SITE_DEF)[k];
+    tgt[k]=typeof d==='number'?(el.value===''?0:parseFloat(el.value)):el.value; }); }
+function run(){ const tg=document.getElementById('mcTog'); if(tg) tg.checked=A.useMC!=='no'; PF=portfolio(); siteTable(); riskPlot(); dlBars(); p50Bars(); const m=PF[cur]; P=m.p; detail(m); dataStats(); }
+function select(i){ cur=i; save(); fillInputs(); run(); }
+document.getElementById('sortBy').addEventListener('change',siteTable);
+document.getElementById('mcTog').addEventListener('change',e=>{ A.useMC=e.target.checked?'yes':'no'; save(); fillInputs(); run(); });
+document.getElementById('bUpd').addEventListener('click',()=>{ const msg=document.getElementById('updMsg'); msg.textContent='Updating...';
+  setTimeout(()=>{ readAll(); if(typeof _pc!=='undefined') _pc.clear(); save(); run(); const d=new Date(); msg.textContent='Updated '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}); },20); });
+document.getElementById('bAdd').addEventListener('click',()=>{ if(SITES.length>=MAXS) return; SITES.push(Object.assign({},SITE_DEF,{site:'Location '+(SITES.length+1)})); select(SITES.length-1); });
+document.getElementById('bDup').addEventListener('click',()=>{ if(SITES.length>=MAXS) return; const c=Object.assign({},SITES[cur]); c.site=(c.site||'Location')+' (copy)'; SITES.push(c); select(SITES.length-1); });
+let delTimer=null; const bDel=document.getElementById('bDel');
+bDel.addEventListener('click',()=>{
+  if(SITES.length<=1) return;
+  if(!bDel.classList.contains('arm')){ bDel.classList.add('arm'); bDel.textContent='Confirm delete'; clearTimeout(delTimer); delTimer=setTimeout(()=>{bDel.classList.remove('arm');bDel.textContent='Delete selected';},3000); return; }
+  clearTimeout(delTimer); bDel.classList.remove('arm'); bDel.textContent='Delete selected';
+  SITES.splice(cur,1); cur=Math.max(0,cur-1); select(cur);
+});
+document.getElementById('refs').innerHTML=REFS.map(([c,u])=>`<li><b>${esc(c)}</b><span class="use">Used for: ${esc(u)}</span></li>`).join('');
+buildTabs(); fillInputs(); run();
+let rz;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(run,150);});
+</script>
